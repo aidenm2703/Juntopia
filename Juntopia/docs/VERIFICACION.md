@@ -52,3 +52,10 @@ El lanzador comprueba los puertos antes de crear procesos. Reutiliza servidores 
 Se desactivó la persistencia de sesión en la configuración local solicitada por el usuario. Se añadieron pruebas para comprobar que sólo se elimina el token del proyecto, se conservan tema y sesiones de otras aplicaciones, y no se alteran los enlaces de recuperación o las rutas públicas explícitas.
 
 Lint aprobado; dieciséis pruebas frontend y trece backend aprobadas; build aprobado. Se cerraron los procesos anteriores de Juntopia y se iniciaron nuevamente frontend y backend. El acceso automático al navegador no estaba disponible: la URL de registro se entrega como enlace para abrir manualmente. No se modificaron cuentas o datos en Supabase.
+## Mensajes de registro y cuenta ya existente
+
+Se corrigió la pérdida del mensaje seguro del backend en el cliente HTTP. El formulario diferencia una cuenta existente de un rechazo de correo, límite de envíos, contraseña o dirección de retorno. El backend conserva los códigos de Auth y devuelve mensajes sanitizados, sin detalles privados del proveedor.
+
+Se verificó por lectura que la cuenta utilizada por el usuario ya existía y tenía el correo confirmado. No se modificó su contraseña ni se intentó registrar nuevamente ese correo. Los tests de duplicados usan un proveedor simulado y no envían mensajes.
+
+Lint, diecisiete pruebas frontend, dieciséis backend, trece comprobaciones de render y build aprobados. La API se reinició y se comprobó que un token deliberadamente inválido recibe 401; los fallos de conexión con Auth se clasifican aparte como 503 mediante pruebas. No se reprodujo la petición real de registro de la captura, porque no se utilizó ni solicitó su contraseña.

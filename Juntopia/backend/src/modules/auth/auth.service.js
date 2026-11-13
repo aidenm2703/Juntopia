@@ -2,17 +2,8 @@ import { createClient } from "@supabase/supabase-js";
 import { ApiError } from "../../shared/errors.js";
 import { requirePassword } from "./password.policy.js";
 import { object } from "../../shared/resource.js";
-function authFailure(error) {
-  const code = error?.code || "AUTH_FAILED";
-  const message =
-    code === "weak_password"
-      ? "La contraseña no cumple la política configurada en Supabase."
-      : code === "over_email_send_rate_limit"
-        ? "Se alcanzó el límite de correos. Esperá e intentá de nuevo."
-        : "No pudimos completar la solicitud de acceso. Revisá los datos e intentá de nuevo.";
-  return new ApiError(error?.status === 429 ? 429 : 400, code, message);
-}
-export async function register(config, input) {
+import { authFailure } from "./auth.errors.js";
+export async function register(config, input, makeClient = createClient) {
   object(input);
   const password = requirePassword(input.password);
   if (
@@ -48,7 +39,7 @@ export async function register(config, input) {
       "INVALID_REDIRECT",
       "La dirección de retorno no está permitida.",
     );
-  const client = createClient(config.supabaseUrl, config.supabaseKey, {
+  const client = makeClient(config.supabaseUrl, config.supabaseKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

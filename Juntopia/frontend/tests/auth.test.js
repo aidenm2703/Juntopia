@@ -1,6 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { validPassword } from "../src/modules/auth/services/passwordPolicy.js";
+import { authErrorMessage } from "../src/modules/auth/services/authErrors.js";
+import { errorMessage } from "../src/shared/domain/index.js";
 import {
   authRedirectUrl,
   parseEmailLink,
@@ -10,6 +12,35 @@ const options = {
   projectUrl: "https://project.supabase.co",
   appUrl: "http://localhost:3000",
 };
+test("existing accounts and email restrictions never look like generic connection failures", () => {
+  assert.match(
+    authErrorMessage({ code: "user_already_exists" }),
+    /Ya tengo cuenta/,
+  );
+  assert.match(
+    authErrorMessage({ code: "email_exists" }),
+    /ya tiene una cuenta/,
+  );
+  assert.match(
+    authErrorMessage({ code: "email_address_not_authorized" }),
+    /SMTP/,
+  );
+  assert.match(
+    authErrorMessage({ code: "over_email_send_rate_limit" }),
+    /límite de envíos/,
+  );
+  assert.equal(
+    errorMessage({
+      code: "INVALID_REDIRECT",
+      userMessage: "La dirección de retorno no está permitida.",
+    }),
+    "La dirección de retorno no está permitida.",
+  );
+  assert.doesNotMatch(
+    errorMessage({ message: "RAW PRIVATE PROVIDER DETAILS" }),
+    /RAW PRIVATE/,
+  );
+});
 test("new passwords require eight characters and an uppercase without requiring digits", () => {
   for (const value of ["Abcdefg", "abcdefgh", "12345678", ""])
     assert.equal(validPassword(value), false);

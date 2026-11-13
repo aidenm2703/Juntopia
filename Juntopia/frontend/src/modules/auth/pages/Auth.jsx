@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../../shared/data/client.js";
 import { api } from "../../../shared/data/api.js";
-import { errorMessage } from "../../../shared/domain/index.js";
+import { authErrorMessage } from "../services/authErrors.js";
 import { request, publicRequest } from "../../../shared/data/http.js";
 import {
   passwordHint,
@@ -73,19 +73,7 @@ export function Auth({ mode, close }) {
         );
       }
     } catch (error) {
-      setMessage(
-        error.code === "invalid_credentials"
-          ? "El correo o la contraseña no son correctos."
-          : error.code === "email_not_confirmed"
-            ? "Confirmá tu correo antes de ingresar."
-            : error.code === "over_email_send_rate_limit"
-              ? "Se alcanzó el límite de correos de acceso. Esperá e intentá de nuevo."
-              : error.code === "PASSWORD_POLICY"
-                ? passwordHint
-                : error.code === "weak_password"
-                  ? "La contraseña no cumple la política configurada en Supabase."
-                  : errorMessage(error),
-      );
+      setMessage(authErrorMessage(error));
     } finally {
       setBusy(false);
     }

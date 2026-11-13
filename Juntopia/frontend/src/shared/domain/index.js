@@ -40,6 +40,8 @@ export function safeUrl(value) {
 export function errorMessage(error) {
   if (!navigatorOnline())
     return "Estás sin conexión. Tus cambios no se guardaron; intentá cuando vuelvas a conectarte.";
+  if (typeof error?.userMessage === "string" && error.userMessage.length <= 500)
+    return error.userMessage;
   if (error?.code === "23505")
     return "Ya existe un registro con esos datos. Revisá tu biblioteca o elegí otro identificador.";
   if (error?.code === "42501")

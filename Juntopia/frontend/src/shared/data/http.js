@@ -14,6 +14,8 @@ export async function publicRequest(path, body) {
     );
     failure.code = payload?.error?.code;
     failure.status = response.status;
+    if (typeof payload?.error?.message === "string")
+      failure.userMessage = payload.error.message;
     throw failure;
   }
   return payload.data;
@@ -44,6 +46,8 @@ export async function request(
     );
     failure.code = payload?.error?.code;
     failure.status = response.status;
+    if (typeof payload?.error?.message === "string")
+      failure.userMessage = payload.error.message;
     throw failure;
   }
   if (!payload || !Object.hasOwn(payload, "data"))
