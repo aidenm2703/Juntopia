@@ -16,13 +16,54 @@ const parties = [
   ['anime-party', '✦', 'Maratón de Anime', '12 conectados'], ['music-party', '♫', 'Escucha juntos', '8 conectados'], ['movie-party', '▣', 'Noche de Pelis', '15 conectados'],
 ]
 
+const landingCategories = [
+  ['M', 'Música', '42 clubs activos', 'l-music'], ['C', 'Cine & Series', '56 clubs activos', 'l-screen'],
+  ['L', 'Libros', '29 clubs activos', 'l-books'], ['V', 'Videojuegos', '64 clubs activos', 'l-games'],
+  ['A', 'Anime & Manga', '41 clubs activos', 'l-anime'], ['K', 'Cómics', '19 clubs activos', 'l-comics'],
+  ['P', 'Podcasts', '23 clubs activos', 'l-podcasts'], ['R', 'Arte & Fanzines', '18 clubs activos', 'l-art'],
+]
+
+function Landing({ onEnter, isLightMode, setIsLightMode }) {
+  const [selectedParty, setSelectedParty] = useState('')
+  const landingParties = [
+    ['ANIME & SERIES', 'Maratón de Anime', 'Neon Genesis & Retro Sci-Fi Nights: análisis de los episodios 1 al 6 con snacks temáticos.', 'Hoy 21:00 UTC', '44 compas', 'l-party-anime'],
+    ['CINE CLUB', 'Noche de Cine', 'Cine de Culto de los 90s & Terror: proyecciones sincronizadas y notas compartidas.', 'Viernes 20:30 UTC', '28 compas', 'l-party-movie'],
+    ['GAMING & CO-OP', 'Co-op Arcade Night', 'Torneo Comunitario Retro & Speedruns: clásicos de 16-bit en línea por equipos.', 'Sábado 19:00 UTC', '32 compas', 'l-party-game'],
+  ]
+  return <main className={`landing-page ${isLightMode ? 'light-mode' : ''}`}>
+    <div className="landing-grid" /><div className="landing-glow landing-glow-a" /><div className="landing-glow landing-glow-b" />
+    <header className="landing-nav glass-panel">
+      <a className="landing-brand" href="#top" aria-label="Inicio de Juntopia"><img src={logo} alt="Juntopia" /></a>
+      <nav aria-label="Navegación de la página de inicio"><a href="#ecosistema">Explorar</a><a href="#como-funciona">Cómo funciona</a><a href="#parties">Parties</a><a href="#creadores">Creadores</a></nav>
+      <div className="landing-nav-actions"><button className="landing-theme" onClick={() => setIsLightMode(!isLightMode)}>{isLightMode ? 'Modo claro' : 'Modo oscuro'}</button><button className="login-button" onClick={onEnter}>Iniciar sesión</button><button className="signup-button" onClick={onEnter}>Crear mi cuenta</button></div>
+    </header>
+
+    <section className="landing-hero" id="top">
+      <div className="hero-copy-landing"><p className="landing-kicker">TU CLUB DE CULTURA POP</p><h1>No vivas tus <span>obsesiones</span> a <strong>solas.</strong></h1><p>Descubrí historias, música, mundos y personas con quienes compartirlos. Un refugio social legítimo para tus intereses.</p><div className="landing-cta"><button className="signup-button" onClick={onEnter}>Entrar a Juntopia <b>›</b></button><a href="#ecosistema" className="explore-button">Explorar el universo <b>›</b></a></div><div className="social-proof"><span><i>AM</i><i>LV</i><i>MR</i></span><b>+ + +</b><small>Miles de gustos, una comunidad activa.</small></div></div>
+      <div className="portal-stage" aria-label="Portal de Juntopia"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="portal-core"><span>J</span><b>PORTAL ACTIVO</b></div><article className="orbit-note note-a"><i>♫</i><span>Byteh Osaka 98'<small>Rebajado 12 compas</small></span></article><article className="orbit-note note-b"><i>C</i><span>Cyber City 1990<small>Noche Sci-Fi Club</small></span></article><article className="orbit-note note-c"><i>L</i><span>Solaris Chronicles #1<small>Capítulo 24 debate</small></span></article><article className="orbit-note note-d"><i>V</i><span>Pixel Quest DX<small>Arcade Room Abierta</small></span></article></div>
+    </section>
+
+    <section className="ecosystem-section" id="ecosistema"><div className="landing-section-head"><div><p className="landing-kicker">ECOSISTEMA RETRO-POP</p><h2>Todo lo que te gusta vive aquí.</h2><p>Ocho universos conectados para explorar sin algoritmos impersonales.</p></div><small>8 Categorías · +240 Círculos</small></div><div className="landing-category-grid">{landingCategories.map(([letter, name, detail, tone]) => <button className={`landing-category ${tone}`} key={name}><i>{letter}</i><strong>{name}</strong><span>{detail}</span></button>)}</div></section>
+
+    <section className="landing-parties" id="parties"><div className="landing-section-head"><div><p className="landing-kicker">PARTIES EN VIVO</p><h2>Convertí tus gustos en planes.</h2><p>Sesiones sincronizadas, debates de estreno y salas de juego organizadas por la comunidad.</p></div><a href="#parties">Ver calendario de eventos ›</a></div><div className="landing-party-grid">{landingParties.map(([tag, title, text, time, people, tone]) => <article className={`landing-party-card glass-panel ${tone}`} key={title}><div><span>{tag}</span><b>EN VIVO</b></div><h3>{title}</h3><p>{text}</p><footer><small>{time}</small><small>{people}</small></footer><button onClick={() => setSelectedParty(title)}>{selectedParty === title ? 'Party seleccionada' : 'Ver Party'}</button></article>)}</div></section>
+
+    <section className="features-section" id="como-funciona"><div className="features-intro"><p className="landing-kicker">LA FILOSOFÍA JUNTOPIA</p><h2>Diseñado por y para fanáticos de la<br />cultura pop.</h2><p>Olvidate del scroll infinito sin alma. Construimos un espacio con memoria, coleccionismo y calor humano.</p></div><div className="feature-grid">{[['01', 'Guardá lo que amás', 'Creá tu biblioteca personal curada: ordená temáticas de películas, libros, tomos de manga y colecciones de juegos sin desorden publicitario.', 'Escuchá sin límites'], ['02', 'Encontrá a tu gente', 'Conectá por gustos reales en lugar de feeds adictivos. Clubes temáticos pequeños, charlas profundas y círculos de confianza genuina.', 'Sin métricas de vanidad'], ['03', 'Armá un plan', 'Transformá cualquier recomendación en una experiencia compartida. Creá una Party con un solo click y vivan el estreno o reto juntos.', 'Sincronización en vivo']].map(([number,title,text,link]) => <article className="feature-card glass-panel" key={number}><i>{number}</i><h3>{title}</h3><p>{text}</p><a href="#top">{link} ›</a></article>)}</div></section>
+
+    <section className="landing-final" id="creadores"><p className="landing-kicker">ACCESO COMUNITARIO ABIERTO</p><h2>Tu próximo mundo<br />favorito empieza aquí.</h2><p>Unite a miles de compas que ya comparten lo que aman. Sin algoritmos vacíos, sin ruido publicitario.</p><button className="signup-button" onClick={onEnter}>Crear mi cuenta gratis</button><small>Registro en 30 segundos · 100% libre de spam</small></section>
+    <footer className="landing-footer"><div><img src={logo} alt="Juntopia" /><p>Juntopia — gustos se vuelven conexiones.</p></div><b>Juntopia</b><nav><a href="#top">Discord</a><a href="#top">Instagram</a></nav><small>© 2026 Juntopia. Todos los derechos reservados.</small></footer>
+  </main>
+}
+
 function App() {
   const [activeNav, setActiveNav] = useState('Inicio')
   const [joined, setJoined] = useState([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLightMode, setIsLightMode] = useState(false)
+  const [view, setView] = useState('landing')
   const nav = [['⌂', 'Inicio'], ['⌕', 'Descubrir'], ['✦', 'Parties'], ['▱', 'Biblioteca'], ['▤', 'Colecciones'], ['◌', 'Amigos']]
   const toggleParty = (title) => setJoined((current) => current.includes(title) ? current.filter((party) => party !== title) : [...current, title])
+
+  if (view === 'landing') return <Landing onEnter={() => setView('dashboard')} isLightMode={isLightMode} setIsLightMode={setIsLightMode} />
 
   return <main className={`app-shell ${isLightMode ? 'light-mode' : ''}`}>
     <div className="ambient ambient-one" /><div className="ambient ambient-two" /><div className="grid-overlay" />
