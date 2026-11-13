@@ -80,3 +80,8 @@ npm.cmd run test:integration --workspace @juntopia/backend
 ```
 
 Las pruebas reales no se ejecutan contra producción ni usan secretos administrativos en código. Ver [verificación](../docs/VERIFICACION.md).
+## Nuevas rutas de acceso
+
+POST /api/auth/register valida correo, aceptación, URL de retorno y contraseña antes de llamar a Supabase Auth. POST /api/auth/password exige sesión válida y la política de ocho caracteres con mayúscula antes de actualizarla. Las contraseñas se mantienen sólo en la solicitud y no se registran.
+
+Las rutas de registro están limitadas por dirección de conexión; Supabase mantiene sus propios controles adicionales. Los ajustes globales de Auth requieren una sesión administrativa y no se modificaron desde este equipo. Ver ../docs/CORREOS_LOCALES.md.

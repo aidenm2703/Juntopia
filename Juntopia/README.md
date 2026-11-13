@@ -90,3 +90,8 @@ No se rellenan permanentemente las cuentas nuevas con usuarios, obras o reproduc
 - Revisión visual interactiva pendiente por indisponibilidad del host de navegador. Se comprobaron compilación, render, API y permisos.
 
 Ver [frontend](frontend/README.md), [backend](backend/README.md), [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md) y [verificación](docs/VERIFICACION.md).
+## Correos y contraseña
+
+Para pruebas con el correo abierto en otro dispositivo, el formulario permite pegar el enlace privado en el computador y verificarlo con el SDK de Supabase, sin seguir la URL localhost. Ver [correos locales](docs/CORREOS_LOCALES.md).
+
+Las nuevas contraseñas requieren mínimo ocho caracteres y una mayúscula, comprobados en el formulario y la API Node. El ingreso sigue aceptando contraseñas anteriores. Para abrir la aplicación directamente desde un teléfono se requiere una URL publicada; localhost pertenece al dispositivo que abre el correo.

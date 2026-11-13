@@ -35,3 +35,10 @@ Los fixtures contienen contraseñas aleatorias descartables: no imprimirlos ni s
 ## Pendiente
 
 Revisión visual de escritorio/móvil, entrega real de correo y recuperación desde bandeja, carga, pentest, revisión legal y despliegue público. No se dan por verificadas las integraciones externas o la reproducción que no están habilitadas.
+## Acceso por correo y política de contraseña
+
+Se añadieron pruebas de enlaces copiados entre dispositivos y política de contraseñas: trece pruebas frontend, once de backend y trece comprobaciones de render. Lint y build comprobados.
+
+La integración HTTP real pasó catorce comprobaciones, incluyendo el cambio a una contraseña de ocho caracteres con mayúscula y un inicio de sesión real con ella. Otra prueba del frontend importó una sesión real desde una URL de retorno de localhost y confirmó al usuario correcto mediante Supabase Auth, sin navegar a esa URL. Se retiraron las cuentas descartables al finalizar.
+
+No se enviaron nuevos correos a una bandeja real ni se automatizó la interfaz del teléfono. No se modificó la configuración administrativa remota de Supabase: la CLI no tiene sesión administrativa. La solución local utiliza los enlaces ya emitidos y el SDK; los detalles están en CORREOS_LOCALES.md.
