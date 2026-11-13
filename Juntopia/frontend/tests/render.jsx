@@ -18,7 +18,7 @@ assert.match(
 );
 assert.match(
   registration,
-  /minLength="12"/,
+  /minLength="8"/,
   "Registration enforces a password length",
 );
 assert.doesNotMatch(
@@ -35,6 +35,9 @@ assert.match(
   "Password changes require confirmation",
 );
 assert.match(recovery, /autoComplete="new-password"/);
+assert.match(recovery, /minLength="8"/);
+assert.match(registration, /pattern=/);
+assert.match(registration, /Usar enlace en este computador/);
 const landing = renderToStaticMarkup(<Landing navigate={() => {}} />);
 assert.match(landing, /<h1>/);
 assert.doesNotMatch(
@@ -52,5 +55,5 @@ const external = renderToStaticMarkup(
 );
 assert.match(external, /noopener noreferrer/);
 console.log(
-  "Render: 10 comprobaciones aprobadas; entrada pública, registro, contraseña, avatares y enlaces.",
+  "Render: 13 comprobaciones aprobadas; entrada pública, registro, contraseña, avatares y enlaces.",
 );

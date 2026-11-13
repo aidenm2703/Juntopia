@@ -1,21 +1,32 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../../shared/data/client.js";
+import {
+  recovering,
+  rememberRecovery,
+  clearRecovery,
+  recoveryEvent,
+} from "../services/emailLinks.js";
 export function useSession() {
   const [state, setState] = useState({
     session: null,
     loading: !!supabase,
     error: "",
   });
-  const [recovery, setRecovery] = useState(() =>
-    window.location.hash.includes("type=recovery"),
-  );
+  const [recovery, setRecovery] = useState(() => recovering(window.location));
   useEffect(() => {
     if (!supabase) return;
     let active = true;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (!active) return;
       setState({ session, loading: false, error: "" });
-      if (event === "PASSWORD_RECOVERY") setRecovery(true);
+      if (event === "PASSWORD_RECOVERY") {
+        rememberRecovery();
+        setRecovery(true);
+      }
+      if (event === "SIGNED_OUT") {
+        clearRecovery();
+        setRecovery(false);
+      }
     });
     supabase.auth
       .getSession()
@@ -40,5 +51,17 @@ export function useSession() {
       data.subscription.unsubscribe();
     };
   }, []);
-  return { ...state, recovery, finishRecovery: () => setRecovery(false) };
+  useEffect(() => {
+    const recover = () => setRecovery(true);
+    window.addEventListener(recoveryEvent, recover);
+    return () => window.removeEventListener(recoveryEvent, recover);
+  }, []);
+  return {
+    ...state,
+    recovery,
+    finishRecovery: () => {
+      clearRecovery();
+      setRecovery(false);
+    },
+  };
 }

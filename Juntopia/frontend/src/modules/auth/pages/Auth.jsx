@@ -2,6 +2,14 @@ import { useState } from "react";
 import { supabase } from "../../../shared/data/client.js";
 import { api } from "../../../shared/data/api.js";
 import { errorMessage } from "../../../shared/domain/index.js";
+import { request, publicRequest } from "../../../shared/data/http.js";
+import {
+  passwordHint,
+  passwordPattern,
+  validPassword,
+} from "../services/passwordPolicy.js";
+import { authRedirectUrl } from "../services/emailLinks.js";
+import { EmailLinkForm } from "../components/EmailLinkForm.jsx";
 export function Auth({ mode, close }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -13,6 +21,10 @@ export function Auth({ mode, close }) {
     if (mode === "register" && form.get("accepted") !== "on") return;
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
+    if (["register", "password"].includes(mode) && !validPassword(password)) {
+      setMessage(passwordHint);
+      return;
+    }
     if (mode === "password" && password !== form.get("confirm")) {
       setMessage("Las contraseñas no coinciden.");
       return;
@@ -20,21 +32,33 @@ export function Auth({ mode, close }) {
     setBusy(true);
     setMessage("");
     try {
-      const redirectTo = window.location.origin + window.location.pathname;
+      const redirectTo = authRedirectUrl(
+        window.location,
+        import.meta.env.VITE_AUTH_REDIRECT_URL,
+      );
       let result;
       if (mode === "login")
         result = await supabase.auth.signInWithPassword({ email, password });
-      else if (mode === "register")
-        result = await supabase.auth.signUp({
+      else if (mode === "register") {
+        const data = await publicRequest("/auth/register", {
           email,
           password,
-          options: { emailRedirectTo: redirectTo },
+          redirectTo,
+          accepted: true,
         });
-      else if (mode === "reset")
+        if (data.session) {
+          const imported = await supabase.auth.setSession(data.session);
+          if (imported.error) throw imported.error;
+        }
+        result = { data, error: null };
+      } else if (mode === "reset")
         result = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo,
         });
-      else result = await supabase.auth.updateUser({ password });
+      else {
+        await request("/auth/password", { method: "POST", body: { password } });
+        result = { data: {}, error: null };
+      }
       if (result.error) throw result.error;
       if (mode === "register" && result.data.session)
         await api.rpc("accept_policy");
@@ -56,7 +80,11 @@ export function Auth({ mode, close }) {
             ? "Confirmá tu correo antes de ingresar."
             : error.code === "over_email_send_rate_limit"
               ? "Se alcanzó el límite de correos de acceso. Esperá e intentá de nuevo."
-              : errorMessage(error),
+              : error.code === "PASSWORD_POLICY"
+                ? passwordHint
+                : error.code === "weak_password"
+                  ? "La contraseña no cumple la política configurada en Supabase."
+                  : errorMessage(error),
       );
     } finally {
       setBusy(false);
@@ -93,11 +121,14 @@ export function Auth({ mode, close }) {
         )}
         {mode !== "reset" && (
           <label>
-            Contraseña{mode !== "login" && " · mínimo 12 caracteres"}
+            Contraseña
+            {mode !== "login" && " · mínimo 8 caracteres y una mayúscula"}
             <input
               name="password"
               type="password"
-              minLength={mode === "login" ? 1 : 12}
+              minLength={mode === "login" ? 1 : 8}
+              pattern={mode === "login" ? undefined : passwordPattern}
+              title={mode === "login" ? undefined : passwordHint}
               maxLength={128}
               autoComplete={
                 mode === "login" ? "current-password" : "new-password"
@@ -112,7 +143,9 @@ export function Auth({ mode, close }) {
             <input
               name="confirm"
               type="password"
-              minLength={12}
+              minLength={8}
+              pattern={passwordPattern}
+              title={passwordHint}
               autoComplete="new-password"
               required
             />
@@ -148,6 +181,18 @@ export function Auth({ mode, close }) {
         <p role="status" aria-live="polite">
           {message}
         </p>
+        {sent && (
+          <button
+            type="button"
+            className="text-button"
+            onClick={() => {
+              setSent(false);
+              setMessage("");
+            }}
+          >
+            Volver a enviar un enlace
+          </button>
+        )}
       </form>
       {mode === "login" && (
         <div className="auth-links">
@@ -156,6 +201,7 @@ export function Auth({ mode, close }) {
         </div>
       )}
       {mode === "register" && <a href="#/login">Ya tengo cuenta →</a>}
+      {mode !== "password" && <EmailLinkForm close={close} />}
     </section>
   );
 }
