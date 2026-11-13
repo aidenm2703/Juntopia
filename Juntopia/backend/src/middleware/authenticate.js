@@ -15,6 +15,6 @@ export function createAuthenticator(config, makeDatabase = createUserDatabase) {
         "INVALID_SESSION",
         "La sesión no es válida. Volvé a ingresar.",
       );
-    return { db, user: data.user };
+    return { db, user: data.user, token: match[1] };
   };
 }

@@ -9,6 +9,15 @@ import {
 } from "../../src/shared/resource.js";
 import { validateImage } from "../../src/modules/creators/storage.service.js";
 import { createRateLimiter } from "../../src/middleware/http.js";
+import { requirePassword } from "../../src/modules/auth/password.policy.js";
+test("server enforces eight characters and an uppercase on new passwords", () => {
+  for (const value of ["Abcdefg", "abcdefgh", "12345678", null])
+    assert.throws(
+      () => requirePassword(value),
+      (error) => error.code === "PASSWORD_POLICY",
+    );
+  assert.equal(requirePassword("Abcdefgh"), "Abcdefgh");
+});
 test("backend config refuses missing credentials and credential-bearing URLs", () => {
   assert.throws(() => loadConfig({}), /SUPABASE_URL/);
   assert.throws(

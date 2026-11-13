@@ -142,3 +142,30 @@ test("large bodies and unsupported operations are refused", async (t) => {
     405,
   );
 });
+test("registration and password changes reject weak passwords before contacting Auth", async (t) => {
+  const { send } = await fixture(t);
+  const registration = await send("/api/auth/register", "POST", {
+    email: "test@example.invalid",
+    password: "abcdefgh",
+    accepted: true,
+    redirectTo: "http://localhost:3000/",
+  });
+  assert.equal(registration.status, 400);
+  assert.equal(registration.body.error.code, "PASSWORD_POLICY");
+  const password = await send("/api/auth/password", "POST", {
+    password: "abcdefgh",
+  });
+  assert.equal(password.status, 400);
+  assert.equal(password.body.error.code, "PASSWORD_POLICY");
+  assert.equal(
+    (
+      await send(
+        "/api/auth/password",
+        "POST",
+        { password: "Abcdefgh" },
+        { Authorization: "" },
+      )
+    ).status,
+    401,
+  );
+});

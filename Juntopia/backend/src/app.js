@@ -12,11 +12,13 @@ import { createResourceController } from "./controllers/resource.controller.js";
 import { callRpc } from "./controllers/rpc.controller.js";
 import { accountExportService } from "./modules/account/export.service.js";
 import { createStorageService } from "./modules/creators/storage.service.js";
+import { register, changePassword } from "./modules/auth/auth.service.js";
 export function createApp({
   config,
   authenticate = createAuthenticator(config),
 }) {
   const limit = createRateLimiter(config.requestsPerMinute);
+  const registrationLimit = createRateLimiter(10);
   return async (request, response) => {
     response.setHeader("X-Request-Id", randomUUID());
     try {
@@ -35,6 +37,17 @@ export function createApp({
         });
         return;
       }
+      if (url.pathname === "/api/auth/register") {
+        if (request.method !== "POST")
+          throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
+        registrationLimit(request.socket.remoteAddress);
+        const data = await register(
+          config,
+          await readBody(request, config.jsonLimit),
+        );
+        sendJson(response, 200, { data });
+        return;
+      }
       const segments = url.pathname.split("/").filter(Boolean);
       const base = "/" + segments.slice(0, 3).join("/");
       const definition = resourceRoutes.get(base);
@@ -43,6 +56,7 @@ export function createApp({
         "/api/account/export",
         "/api/creators/files",
         "/api/creators/files/signed",
+        "/api/auth/password",
       ].includes(url.pathname);
       if (!rpc && !custom && (!definition || segments.length > 4))
         throw new ApiError(404, "NOT_FOUND", "Ruta no disponible.");
@@ -50,7 +64,11 @@ export function createApp({
       limit(context.user.id);
       const readJson = () => readBody(request, config.jsonLimit);
       let data;
-      if (rpc) {
+      if (url.pathname === "/api/auth/password") {
+        if (request.method !== "POST")
+          throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
+        data = await changePassword(config, context, await readJson());
+      } else if (rpc) {
         if (request.method !== "POST")
           throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
         data = await callRpc(context, rpc, await readJson());

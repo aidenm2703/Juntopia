@@ -159,6 +159,21 @@ try {
     ).status === 403,
     "No moderator privilege escalation",
   );
+  check(
+    (await send(0, "/api/auth/password", "POST", { password: "abcdefgh" }))
+      .status === 400,
+    "Lowercase-only password is rejected by server",
+  );
+  await ok(0, "/api/auth/password", "POST", { password: "Nueva12A" });
+  const changed = await clients[0].auth.signInWithPassword({
+    email: users[0].email,
+    password: "Nueva12A",
+  });
+  check(
+    !changed.error && !!changed.data.session,
+    "An eight-character password with an uppercase works in real Auth",
+  );
+  tokens[0] = changed.data.session.access_token;
   console.log(
     `HTTP real: ${checks} comprobaciones aprobadas contra Node + Supabase.`,
   );
