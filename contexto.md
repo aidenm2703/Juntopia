@@ -1,85 +1,182 @@
-JUNTOPIA — CONTEXTO MAESTRO PARA LA IA DESARROLLADORA
-0. Qué se debe construir
-Juntopia es una plataforma WEB responsive de entretenimiento, cultura, creatividad y experiencias compartidas. Se desarrolla inicialmente con React + TypeScript, con backend Supabase (Auth, PostgreSQL, Realtime y Storage). Debe funcionar en escritorio, tablet y celular; una app móvil Android/iOS es una fase futura, NO el producto inicial.
 
-Idea principal: «Bienvenido a Juntopia: el lugar donde podés divertirte, descubrir historias, escuchar música, leer, jugar y encontrar personas con tus mismos gustos. No importa dónde estés: siempre hay algo que podemos hacer juntos».
 
-No construir una página de demostración con botones vacíos. Diseñar un producto modular, coherente y progresivamente funcional, con persistencia de datos, permisos, estados de carga, errores, seguridad y pruebas. Distinguir claramente entre funcionalidades listas, prototipos y futuras integraciones que requieren permisos.
+1. Visión del producto
+Juntopia es un mundo digital acogedor para personas que, incluso estando lejos, quieren hacer cosas juntas: descubrir y compartir música, películas, series, anime, manga, libros, videojuegos, podcasts, arte, documentales y otras experiencias culturales. Su frase central es «¿Cuál es el plan de hoy?». La propuesta no es una red social basada principalmente en un feed infinito: es una comunidad de intereses y actividades compartidas, con catálogos, colecciones personales, reseñas, amistades, chats y Parties (encuentros organizados).
 
-1. Experiencia de entrada: plataforma cerrada con bienvenida pública
-La página inicial (/) es una landing pública, visualmente atractiva, con identidad de Juntopia, explicación breve de sus ventajas, ejemplos de actividades y dos acciones principales: Iniciar sesión y Crear cuenta. No exponer colecciones privadas, mensajes, perfiles restringidos ni salas internas a visitantes anónimos. Puede mostrarse contenido promocional de ejemplo, sin datos personales reales.
+Eslogan sugerido: «Diferentes caminos, un lugar para encontrarnos». El producto debe transmitir compañía, pertenencia, exploración y diversión. Debe sentirse como un lugar real al que se vuelve, no como un prototipo con botones decorativos.
+2. Referencia visual obligatoria: assets/juntopia
+1. Buscar en el repositorio una imagen cuyo nombre base sea juntopia dentro de assets (por ejemplo assets/juntopia.png, .jpg, .jpeg, .webp; también revisar src/assets y public/assets). No asumir una extensión ni una ruta exacta sin comprobarla.
+2. Abrir e inspeccionar visualmente la imagen antes de implementar o rediseñar. Si la IA no puede verla, solicitar al usuario que la adjunte o describir esa limitación; no inventar detalles supuestamente observados.
+3. Usarla como referencia principal de identidad y composición. No pegar la imagen como fondo de una página y llamarlo implementación: reconstruir la interfaz mediante componentes reales, accesibles y responsive.
+4. Mantener su estética Bosque premium y acogedor, con un toque singular, más creíble y cuidado que una interfaz genérica de IA: verdes profundos, musgo, oliva, salvia, luces cálidas, crema, fotografías/ilustraciones de contenido cuidadosamente integradas, texturas naturales discretas, paneles translúcidos moderados, esquinas redondeadas, sombras suaves, jerarquía tipográfica limpia y abundante aire visual.
+5. Conservar, en la medida que se aprecien en la imagen: logotipo Juntopia, menú lateral, barra de búsqueda superior, avatar, notificaciones, mensajes, saludo «¡Hola, [nombre]! 👋», subtítulo «¿Cuál es el plan de hoy?», tarjetas de categorías, recomendaciones, Parties activas, amigos conectados, próximos planes, espacio de Juntopia Plus y reproductor musical inferior solo cuando haya una fuente autorizada reproducible.
+6. El motivo del bosque representa estar juntos: un refugio o casa del árbol, un punto de encuentro, caminos que convergen, luces compartidas, pequeñas señales de vida y comunidad. Evitar ballenas, estética oceánica, saturación de hongos decorativos, neón exagerado, personajes artificiales repetidos, fondos recargados y efectos visuales que dificulten leer o usar la aplicación.
+7. El diseño debe sentirse como un producto web profesional terminado. Priorizar tipografía consistente, espaciado, contraste, alineación, estados de interacción y contenido auténtico. La imagen es referencia de apariencia, no prueba de que sus ejemplos de contenido, puntuaciones o reproducciones existan en la base de datos.
+8. Si el proyecto ya tiene componentes y lógica, preservarlos y adaptarlos. No sobrescribir funcionalidades ni eliminar datos para igualar la imagen.
+2.1. Paleta base propuesta (ajustar tras observar la imagen)
+Token	Modo oscuro	Modo claro	Uso
+--bg	#101B14	#F7F6EE	Fondo de aplicación
+--surface	#1B2B20	#FFFFFF	Tarjetas y paneles
+--surface-alt	#26382A	#EEF2E6	Superficies secundarias
+--primary	#A5C86A	#397344	Acciones principales
+--primary-hover	#C0DE87	#285C35	Hover
+--text	#F5F5EA	#17271B	Texto principal
+--muted	#B5C2B0	#536454	Texto secundario
+--border	#3D5140	#DCE5D6	Bordes
+--warm	#F1C77D	#A56D22	Luces, detalles
 
-Mensaje principal sugerido: «Bienvenido a Juntopia». Subtítulo: «Tu lugar para divertirte, leer, descubrir música, ver películas, jugar y conocer personas que disfrutan lo mismo que vos. Lejos o cerca, siempre podemos hacer algo juntos». Botones: «Crear mi cuenta» y «Ya tengo cuenta». Otras secciones: «¿Qué podés hacer?», «Cómo funcionan las Parties», «Explorá tus mundos», privacidad, preguntas frecuentes y enlaces legales.
 
-Inicio de sesión: email/contraseña, verificación y recuperación de contraseña; sesiones persistentes seguras, cierre de sesión, rutas protegidas, validación de email y mensajes claros. Inicio con proveedores externos solo si está correctamente configurado y autorizado. Tras iniciar sesión, enviar al inicio interno o completar onboarding si quedó pendiente.
+Colores de categoría, constantes en ambos temas pero ajustando tonos/contraste: Música violeta/lavanda #A78BFA; Cine y series coral #FB7185; Libros miel/dorado #F5B942; Videojuegos verde menta #34D399; Arte rosa/frambuesa #F472B6; Parties turquesa #35C6BE. Anime/manga puede usar índigo #818CF8; podcasts azul cielo #60A5FA; documentales ámbar #F59E0B; cursos/creación terracota #D99B75. Usar estos colores como acentos (iconos, chips, estados y bordes), no como fondos gigantes que compitan con el bosque.
 
-Registro: email, contraseña, nombre de usuario único, aceptación de términos y política de privacidad, verificación de correo cuando corresponda. No crear perfiles públicos sin consentimiento explícito. Proteger contra abuso y enumeración de cuentas.
+Modo oscuro, claro y sistema: selector persistente por usuario, o localmente antes del inicio de sesión. Respetar prefers-reduced-motion, navegación por teclado, foco visible, contrastes WCAG y tamaños táctiles adecuados.
+2.2. Estructura visual de la pantalla principal
+- Escritorio: sidebar a la izquierda (Inicio, Descubrir, Parties, Biblioteca, Colecciones, Amigos, Mi perfil, Configuración); header con búsqueda, notificaciones, mensajes y menú del avatar; zona central con hero, categorías, recomendaciones y Parties; columna derecha con amigos y agenda si hay espacio; reproductor inferior contextual, no falso.
+- Tableta: sidebar colapsable, tarjetas fluidas, columna secundaria reubicable.
+- Móvil: navegación inferior o menú accesible, hero compacto, tarjetas desplazables o cuadrícula de dos columnas, agenda y amigos apilados; sin desbordamientos horizontales.
+- Estados reales: loading, vacío, error, sin conexión, contenido no disponible, usuario sin amigos y Party sin participantes; nunca rellenar permanentemente con datos ficticios.
+3. Entrada pública y acceso al mundo privado
+3.1. Visitante sin sesión
+Mostrar una landing pública separada del dashboard privado, inspirada en el estilo bosque: logo, breve explicación, ilustración/ambiente de un lugar de encuentro y texto sugerido:
 
-2. Onboarding y avatar: primer ingreso
-Después del registro, ofrecer seis avatares base distintos y seleccionables (por ejemplo: explorador, soñador, artista, aventurero, nocturno, cósmico), visualmente inclusivos y sin obligar a seleccionar género. Permitir personalizar color de piel, peinado, cabello, ojos, ropa, accesorios y fondo según la disponibilidad real de assets; ofrecer vista previa, guardar, volver atrás y editar más tarde. Si no hay un editor avanzado implementado, comenzar con seis ilustraciones y opciones simples reales, no controles ficticios.
+«Bienvenido a Juntopia»
 
-Luego preguntar intereses mediante categorías seleccionables: películas, series, libros, música, videojuegos, anime, manga/manhwa, cómics, podcasts, documentales, arte, escritura, talleres y aprendizaje. Permitir seleccionar varios géneros, gustos y actividades; elegir privacidad, idioma, zona horaria y notificaciones opt-in. Mostrar progreso del onboarding, permitir omitir preguntas no esenciales y editar preferencias desde Configuración. Guardar todo en Supabase y no repetir onboarding una vez completado.
-3. Navegación interna y diseño
-Después del onboarding, mostrar un dashboard personalizado con saludo, recomendaciones, próximas Parties, actividad de amigos (según privacidad), listas pendientes, descubrimientos y accesos rápidos. Navegación principal: Inicio, Descubrir, Parties, Colecciones, Agenda, Mensajes, Perfil; incluir Amigos/Clubes, Tinta Viva, Galería Viva y Configuración accesibles desde menús apropiados. Escritorio con barra lateral; móvil con navegación compacta y menú; tablet con paneles adaptativos. Sin pantallas vacías: usar estados de primera vez y CTA útiles.
+«El lugar donde podés divertirte, leer, descubrir música, jugar y encontrar personas con tus mismos gustos. Aunque estemos lejos, siempre podemos compartir un plan.»
 
-Identidad visual cozy/cinematográfica, moderna y accesible: modo claro (crema, borgoña) y oscuro (ciruela oscuro, dorado/crema), opción automático, tipografía legible, tarjetas redondeadas, microinteracciones discretas, soporte teclado, foco visible, contraste, reducción de movimiento y tamaños de texto adaptables.
-4. Principio arquitectónico: TODO ESTÁ CONECTADO
-Cada objeto cultural (película, serie, episodio, libro, canción, álbum, artista, juego, anime, manga, podcast, obra artística, etc.) tiene una ficha canónica con ID estable, tipo, título, creador(es), imágenes autorizadas, descripción, géneros, enlaces oficiales, disponibilidad y metadatos específicos. Desde su ficha, cuando aplique, se puede: guardar en colección, marcar estado, calificar, reseñar, etiquetar emocionalmente, compartir, recomendar, descubrir fans, crear Party, añadir a agenda, comentar con control de spoilers y ver dónde disfrutarlo legalmente.
+Acciones claras: «Ingresar con mi cuenta» y «Crear cuenta». Opcional: secciones informativas públicas de cómo funciona, categorías y seguridad, sin exponer datos privados. No mostrar dashboard, chats o perfiles privados a usuarios sin autenticar.
+3.2. Iniciar sesión
+Supabase Auth con correo y contraseña, verificación de correo según configuración, recuperación de contraseña, cierre de sesión y manejo seguro de errores. OAuth con Google opcional si está configurado y permitido. No prometer proveedores no conectados. Redirigir según estado: onboarding pendiente o dashboard.
+3.3. Crear cuenta y onboarding
+Flujo por pasos con progreso, posibilidad de volver y guardado seguro:
+1. Registro y aceptación de términos/política.
+2. Elegir una de seis bases de avatar diferentes, visualmente consistentes con Juntopia; ofrecer diversidad de estilos sin imponer identidades.
+3. Personalizar avatar (cabello, colores, accesorios, ropa, fondos y, si se implementa, expresiones). Crear y guardar representación propia; no depender de imágenes generadas en cada visita. Permitir editarlo después.
+4. Elegir nombre visible, identificador único y descripción opcional; validar duplicados y reglas.
+5. Seleccionar intereses y categorías (música, películas, series, libros, videojuegos, anime, manga, podcasts, arte, etc.), géneros y algunos favoritos; se pueden saltar pasos no esenciales.
+6. Configurar privacidad básica y terminar con «Entrar a Juntopia».
+Guardar estado del onboarding para reanudar si se interrumpe. Evitar bloquear a personas que todavía no saben sus gustos.
+4. Navegación y funciones transversales
+Todo contenido tiene una ficha normalizada con identificador, categoría, título, descripción, imagen con derechos/atribución, fuentes, identificadores externos, enlaces oficiales, disponibilidad y datos de autoría cuando proceda. Un usuario puede, según categoría:
+- Buscar, filtrar y explorar.
+- Guardar en favoritos y colecciones propias.
+- Marcar estado: pendiente, en progreso, completado, abandonado o equivalente.
+- Calificar y reseñar, con prevención de duplicados, edición y reportes.
+- Añadir etiquetas emocionales personalizadas: «Me produce serotonina», «Para días difíciles», «Quiero compartirlo», etc.
+- Compartir la ficha o una lista respetando privacidad.
+- Ver coincidencias de gustos y sugerencias de personas, sin exponer datos privados.
+- Crear una Party vinculada a esa ficha.
+- Acceder a proveedores externos o reproductores autorizados cuando existan.
+Regla fundamental: las funciones de comunidad, colecciones, reseñas y Parties deben funcionar aunque un proveedor de reproducción no esté disponible.
+5. Módulos de contenido
+5.1. Música
+Catálogo de artistas, álbumes, canciones y géneros; búsqueda y fichas; calificaciones de canciones, álbumes y artistas; reseñas; playlists y colecciones emocionales; favoritos; compartir; recomendaciones; actividad de amigos si la privacidad lo permite. Si una canción no aparece, formulario «Solicitar/agregar canción» con título, artista, álbum opcional, enlaces y validación contra duplicados; revisión/moderación y trazabilidad de origen. No permitir que usuarios carguen audio comercial ajeno sin derechos.
 
-Las acciones se sincronizan en toda la web: guardar una película en «Quiero ver» alimenta recomendaciones de Parties; una Party aparece en Agenda; un amigo con gustos compatibles aparece en Descubrir; la calificación de una canción aparece en la biblioteca y su ficha; terminar un libro actualiza progreso y estadísticas. Evitar duplicar obras por usuario: separar catálogo global de datos personales y relaciones.
-5. Catálogo, búsqueda y altas de contenido
-Búsqueda global con autocompletado, filtros por tipo/género/año/idioma, resultados accesibles y páginas de detalle. Importar metadatos de APIs oficiales y fuentes autorizadas, con credenciales protegidas en servidor, límites, caché, atribución y cumplimiento de términos. No asumir que una API cubre todas las categorías ni que otorga licencias de reproducción.
+Integraciones: MusicBrainz para metadatos según condiciones y límites; evaluar Jamendo solo bajo licencia compatible; YouTube IFrame Player API para videos insertables conforme a sus reglas; enlaces oficiales a Spotify, YouTube Music u otros. Spotify no debe ser requisito para usar música. No fingir reproducción ni extraer audio de videos. Un reproductor persistente solo aparece cuando hay audio/video autorizado y controlable; si no, mostrar «Abrir en proveedor».
 
-Si una canción, artista, álbum, película, libro u obra no aparece, ofrecer «Solicitar agregar» o «Proponer contenido»: formulario con tipo, título, creador, enlaces oficiales y datos verificables. Buscar coincidencias antes de crear; moderación/validación de propuestas, procedencia, prevención de duplicados, historial de cambios y mecanismos para corregir fichas. Usuarios no deben poder adjudicarse autoría de obras ajenas. Para obras originales propias, usar flujo separado de publicación y derechos.
-6. Música: experiencia completa y conectada
-Catálogo de artistas, álbumes, canciones y géneros; fichas con carátula autorizada, metadatos, vínculos a servicios, calificaciones 1–5 estrellas, reseñas, favoritos, estados, etiquetas emocionales («Me produce serotonina», «Me da energía», «Me pone triste», «Me recuerda a alguien»), listas personales y compartidas. Cada canción puede asociarse a una Party y a recomendaciones de personas con gustos similares.
+Party musical: participantes, chat, lista/cola compartida, moderador, votaciones y reproducción sincronizada solo si la licencia y API del proveedor lo permiten. Para otros casos, actividad social compartida con enlaces oficiales y acciones coordinadas sin afirmar sincronización real.
+5.2. Cine y series
+Buscar y explorar películas/series; fichas, reparto cuando esté licenciado, temporadas/episodios, seguimiento, puntuaciones, reseñas, listas y recomendaciones. TMDB es candidato para metadatos, pero su uso comercial requiere revisar/obtener permisos; no asumir que la API gratuita sirve para Juntopia con anuncios/Plus. Mostrar plataformas oficiales de disponibilidad cuando los datos estén licenciados y sean regionalmente pertinentes. Parties de cine con sala, chat, calendario, cuenta regresiva y enlaces oficiales; no incrustar ni retransmitir Netflix, Disney+, Prime Video, Max, etc. sin acuerdos.
+5.3. Libros y lectura
+Google Books y Open Library para descubrimiento y metadatos según condiciones; biblioteca personal, progreso, citas breves propias, reseñas, calificaciones, metas, clubes y sesiones. Lector EPUB/PDF para archivos propios o contenidos autorizados y obras de dominio público verificadas por jurisdicción. No distribuir libros comerciales protegidos sin autorización. Permitir publicaciones originales en Tinta Viva, con autoría, capítulos, borradores, privacidad, comentarios y moderación.
+5.4. Videojuegos
+IGDB como candidato de metadatos (requiere credenciales de Twitch y cumplimiento de condiciones); fichas, plataformas, géneros, puntuaciones, backlog, jugado/por jugar, juegos cooperativos, grupos para encontrar compañeros, sesiones y Parties de juego. No afirmar que los juegos se ejecutan dentro de Juntopia. Enlaces a tiendas oficiales cuando corresponda.
+5.5. Anime y manga
+Fichas, temporadas, episodios/capítulos, progreso, calificaciones, reseñas, colecciones, recomendaciones, grupos de fans y sesiones. Evaluar proveedores como AniList/Jikan solo después de comprobar políticas, límites, derechos y compatibilidad comercial; crear adaptadores reemplazables.
+5.6. Podcasts y documentales
+Descubrimiento y fichas; podcasts mediante RSS públicos/autorizados con respeto a derechos, alojamiento y restricciones; episodios, seguimiento, favoritos, reseñas y salas de conversación. Documentales con catálogo y enlaces a fuentes oficiales. No rehostear archivos ajenos sin permiso.
+5.7. Arte, creadores y aprendizaje
+Galería Viva: portafolios, obras originales, técnicas, colecciones, comentarios, talleres y eventos. Permitir imágenes propias o con licencia válida; registrar autoría y derechos. Wikimedia Commons solo con licencias/atribuciones compatibles. Talleres, cursos y proyectos colaborativos; no copiar cursos de terceros. Tinta Viva para escritura original. Permitir denuncias, moderación y configuración de visibilidad.
+6. Parties: núcleo social de Juntopia
+Una Party es una experiencia compartida, no necesariamente un video sincronizado. Tipos: escuchar música, ver películas por proveedor externo, leer, club de anime, jugar, dibujar, escribir, conversar, talleres y sesiones temáticas.
 
-Spotify, YouTube, YouTube Music, Deezer y otros: implementar conectores desacoplados y usar solo APIs/SDKs oficiales y capacidades expresamente permitidas. Distinguir: (a) metadatos y enlaces, (b) conexión de cuenta OAuth, (c) reproducción oficial embebida, (d) control de reproducción, (e) sincronización multiusuario. Cada nivel requiere capacidades y permisos diferentes. No descargar, extraer audio, redistribuir ni eludir DRM. No prometer sincronización de Spotify/YouTube Music u otros si el proveedor no la autoriza. Un enlace externo o reproductor oficial permitido es una alternativa válida.
+Cada Party requiere: título, descripción, anfitrión, categoría, contenido opcional, modalidad, fecha/hora/zona horaria, duración, cupos, privacidad (pública/amigos/invitación), invitaciones, RSVP (voy/tal vez/no voy), lista de espera opcional, reglas, participantes, chat, moderación, reportes, recordatorios y estado (programada/en vivo/finalizada/cancelada). La agenda personal y las notificaciones deben reflejar los cambios.
 
-Sala musical compartida: anfitrión, participantes, chat, lista de canciones propuestas, votos para siguiente canción, moderación de cola, presencia y sincronización de eventos de sala mediante Supabase Realtime. La cola compartida puede funcionar incluso cuando la reproducción se realiza individualmente en el servicio oficial. Si existe integración autorizada, agregar controles sincronizados respetando sus restricciones. Mostrar claramente qué puede hacer cada usuario según servicio, país, suscripción y permisos. No asumir que todos oyen audio simultáneo solo por estar en la misma sala.
-7. Películas, series, anime, manga, libros, juegos, podcasts, arte y aprendizaje
-- Películas/series: fichas, temporadas/episodios, vistos/viendo/pendientes, reseñas, estrellas, rewatch, listas, spoilers, disponibilidad oficial, Parties.
-- Anime/manga/manhwa/cómics: progreso por episodios/capítulos/tomos, estados, recomendaciones, clubes y actividades.
-- Libros: quiero leer/leyendo/terminado, progreso, reseñas, citas y notas privadas, clubes, lector para dominio público, licencias o archivos propios EPUB/PDF sin redistribución, marcadores y TTS cuando se permita.
-- Videojuegos: backlog, jugando/terminado, plataformas, reseñas, juegos cooperativos, grupos para encontrar compañeros, Parties de juego sin prometer integración con partidas externas.
-- Podcasts/documentales/cursos: episodios, progreso, listas, reseñas, recomendaciones, sesiones de escucha o discusión con enlaces legales.
-- Arte: fichas de obras, galerías, favoritos, portafolios, eventos y colaboración con permisos.
-- Tinta Viva: publicar historias originales por capítulos, editor con autosave, borradores, comentarios, coautoría controlada, opciones de visibilidad, derechos de autor, moderación.
-- Galería Viva: publicar ilustraciones/fotografías/cómics, portafolios, talleres, proyectos colaborativos, encargos opcionales y herramientas de dibujo futuras.
-8. Parties: núcleo social de Juntopia
-Crear evento desde una obra o desde la sección Parties. Datos: título, actividad/obra vinculada, descripción, anfitrión, fecha/hora con zona horaria, cupos, privacidad (pública/amigos/invitación), plataforma necesaria, reglas, política de spoilers, chat, audio opcional si se implementa, recordatorios, permisos y estado. Flujos: descubrir, solicitar/reservar, confirmar, cancelar, lista de espera, invitación, notificación, sala previa, sala activa y cierre con reseña/valoración de experiencia. Prevenir sobrecupos y duplicidad de reservas con transacciones/constraints. Moderación, expulsión/bloqueo y reportes.
+Modalidades técnicas:
+1. Integrada autorizada: reproductor y controles cuando el proveedor y la licencia lo permitan.
+2. Externa coordinada: cada usuario abre el proveedor oficial; Juntopia ofrece chat, enlace, temporizador y coordinación sin eludir DRM ni afirmar reproducción sincronizada.
+3. Actividad interna: chat, lectura autorizada, discusión, votaciones, dinámicas y colaboración sin medios externos.
+Implementar en tiempo real presencia, mensajes y cambios de estado mediante Supabase Realtime donde sea apropiado. Manejar reconexiones, expulsiones, permisos y fallos de red.
+7. Comunidad y perfiles
+Perfiles con avatar, biografía, intereses, colecciones públicas, reseñas y actividad según configuración. Solicitudes de amistad o seguimiento según el modelo elegido, bloqueo, reportes, chats 1:1 y grupales, notificaciones y recomendaciones por gustos en común. Privacidad por defecto: no revelar bibliotecas privadas, presencia, ubicación precisa ni conversaciones. Permitir desactivar visibilidad de actividad. Controles antiacoso y herramientas de moderación.
 
-Las Parties pueden ser noches de cine, clubes de lectura, escucha musical, videojuegos cooperativos, talleres, dibujo, conversaciones temáticas y aprendizaje. Para contenido de terceros, los participantes usan sus propias cuentas/licencias cuando sean necesarias; nunca compartir credenciales ni retransmitir contenido sin permiso. Ofrecer cuenta regresiva y chat cuando la reproducción sincronizada no esté disponible legalmente.
-9. Colecciones, calificaciones, perfiles y comunidad
-Bibliotecas por categoría, listas ilimitadas en versión gratuita, etiquetas personalizadas, estados, privacidad individual, calificaciones 1–5 (medias estrellas opcionales), reseñas con spoiler toggle, historial y estadísticas básicas. Perfil con avatar, biografía, favoritos, colecciones visibles, amistades y Parties, siempre sujeto a privacidad. Solicitudes de amistad, compatibilidad basada en intereses con explicación y controles, mensajes privados, clubes temáticos, reportes, bloqueos y moderación. No crear feed infinito de popularidad como eje del producto.
-10. Agenda, avisos y preferencias
-Calendario personal con Parties reservadas, eventos propios, recordatorios, actividades recurrentes, invitaciones y enlaces. Notificaciones dentro de la web y, si el usuario acepta y el navegador lo permite, notificaciones push; emails transaccionales según configuración. Recomendaciones de eventos basadas en «Quiero ver/leer/jugar» o géneros, con opt-in y ajustes granulares. Evitar spam y permitir silenciar categorías/personas.
-11. Modelo freemium
-Gratis: perfiles, amistades, colecciones y etiquetas sin límite artificial, calificaciones, reseñas, Parties básicas, agenda, lectura/publicación permitida y herramientas esenciales. Publicidad como máximo objetivo de 2 anuncios por usuario/día, solo en navegación; nunca durante lectura, escritura, reproducción ni Parties. Plus previsto a US$5,99/mes: sin anuncios, temas, estadísticas avanzadas, diarios, herramientas pro de escritura/arte, opciones de Parties, narración avanzada e IA con cuotas claras. Plus no incluye suscripciones externas. Propinas a creadores con objetivo 75% creador/25% plataforma, condicionado a pasarelas, comisiones, impuestos y reglas aplicables. No integrar pagos reales sin seguridad, políticas y configuración verificadas.
-12. Arquitectura técnica solicitada
-React + TypeScript, enrutado con rutas públicas/protegidas, componentes reutilizables, separación por dominios/features, servicios tipados, formularios validados, manejo centralizado de errores, carga diferida, accesibilidad y pruebas. Supabase Auth/Postgres/Realtime/Storage; políticas RLS para cada tabla, validación server-side, roles (usuario/moderador/admin), Storage privado cuando corresponda, índices y migraciones versionadas. Claves secretas y tokens externos NUNCA en el cliente. Proponer modelo de datos normalizado: profiles, avatars, interests, catalog_items, creators/artists, external_ids, provider_links, user_items, ratings, reviews, collections, collection_items, tags, user_item_tags, friendships, clubs, parties, party_members, waitlists, chats/messages, notifications, reports, creator_works, subscriptions, etc. Adaptar entidades especializadas por categoría sin llenar una sola tabla de columnas nulas.
+No hacer que el feed infinito sea el centro de la experiencia; priorizar «qué hacer», «con quién» y «qué descubrir».
+8. Monetización prevista (no implementar cobros ficticios)
+Modelo freemium: funciones esenciales gratuitas. Juntopia Plus como propuesta inicial de USD 5.99/mes (precio sujeto a validación), con personalización adicional y ventajas no esenciales. Si se habilita publicidad, objetivo de máximo dos anuncios al día, nunca durante lectura, reproducción o Parties. Propinas voluntarias a creadores con reparto objetivo 75 % creador / 25 % plataforma, sujeto a pasarelas, comisiones, impuestos y reglas aplicables. No habilitar pagos, propinas o anuncios reales hasta definir proveedor, obligaciones legales, consentimiento y permisos. Evitar paywalls que impidan la función social básica.
+9. Arquitectura y stack
+- Primera fase: web responsive con React + TypeScript. Preferir Vite si el repositorio no tiene framework ya definido; conservar la base existente si está bien configurada. No migrar de framework sin autorización.
+- UI: componentes reutilizables, diseño por tokens CSS, estados accesibles, iconografía coherente y animaciones sutiles. Tailwind opcional según proyecto.
+- Backend: Supabase para PostgreSQL, Auth, Storage, Realtime y Edge Functions cuando corresponda.
+- Futuro: aplicación nativa Android/iOS en una fase posterior (por ejemplo React Native) reutilizando contratos de API y lógica; no desviar el alcance inicial hacia una app nativa.
+- Integraciones: capa de adaptadores por proveedor, sin acoplar las fichas a una sola API. Validación y normalización de datos, caché conforme a licencias, límites de uso, backoff, observabilidad y fallbacks.
+- Seguridad: claves secretas únicamente en servidor/Edge Functions; variables públicas limitadas a valores publicables; Row Level Security en tablas de usuario; permisos por rol; validación server-side; políticas de Storage; rate limiting; sanitización de contenido y protección ante abuso.
+- Desarrollo: migraciones versionadas, seed opcional identificado como demo, tipos generados, pruebas y documentación de configuración.
+9.1. Entidades de base de datos orientativas
+profiles, avatar_presets, avatar_customizations, user_interests, categories, content_items, content_external_ids, content_sources, artists, content_creators, collections, collection_items, user_content_status, ratings, reviews, review_reactions, tags, user_content_tags, friendships, follows (si aplica), blocks, conversations, conversation_members, messages, parties, party_invites, party_attendees, party_waitlist, party_messages, notifications, reports, moderation_actions, creator_posts, creator_works, chapters, playlists, playlist_items, integration_jobs, content_submissions, user_settings.
 
-Preparar estructura /src/app, /src/features/{auth,onboarding,profile,discover,catalog,collections,music,parties,agenda,social,creators,settings}, /src/components, /src/lib, /src/services, /src/styles, /supabase/migrations, /tests, /docs. Mantener nombres coherentes, código comentado donde explique decisiones, README de instalación, .env.example sin secretos, instrucciones para VS Code, scripts de desarrollo y pruebas.
-13. Plan de implementación y criterios de aceptación
-MVP 1: landing, registro/login/logout/reset, rutas privadas, seis avatares y personalización básica real, selección de intereses, dashboard, catálogo inicial autorizado o datos de ejemplo etiquetados, búsqueda, fichas, bibliotecas, estrellas, reseñas y etiquetas, responsive claro/oscuro/automático. Datos persistentes, RLS y pruebas.
+Estas son sugerencias: diseñar relaciones, claves foráneas, índices, unicidad, integridad, auditoría y RLS antes de crear tablas. No duplicar modelos si ya existen. Separar contenido global de las interacciones personales. Guardar identificadores externos y procedencia para evitar duplicados. Respetar términos de retención de cada proveedor.
+10. Integraciones y permisos: decisiones obligatorias
+Proveedor	Uso deseado	Riesgo/restricción	Estrategia inicial
+Spotify	Música y cuentas	Reproducción, Premium, acceso ampliado y usos comerciales restringidos	Enlaces oficiales; no dependencia central
+YouTube	Videos y música audiovisual	IFrame y políticas de reproductor, contenido no insertable	Embed oficial donde sea permitido
+YouTube Music	Música	Sin API pública general equivalente para reproductor social propio	Enlaces oficiales / YouTube permitido
+Netflix/Disney+/Prime Video/Max/Apple TV	Películas/series	Sin permiso general para retransmisión integrada	Fichas + Party externa con chat
+MusicBrainz	Metadatos musicales	Límites y condiciones para uso comercial	Consultar licencias antes del lanzamiento
+Jamendo	Música autorizada	Licencia según uso y monetización	Evaluar acuerdo comercial si aplica
+Google Books	Libros/metadatos	No concede automáticamente texto completo	Catálogo + enlaces; lectura autorizada aparte
+Open Library	Libros/metadatos	Límites, uso responsable y disponibilidad	Catálogo y fallback con caché permitida
+IGDB	Videojuegos	Credenciales y términos de API	Integrar con backend seguro
+TMDB	Cine/series	API gratuita no comercial; atribución/licencia comercial	Evaluar licencia antes de monetizar
+AniList/Jikan u otros	Anime/manga	Términos y límites variables	Investigar antes de implementar
+Wikimedia Commons	Arte/medios	Licencia específica por archivo	Mostrar atribución y derechos
+RSS podcasts	Podcasts	Derechos y políticas de cada feed	Solo reproducción/enlaces permitidos
 
-MVP 2: amistades, descubrimiento, Parties con cupos y agenda, chat, notificaciones y moderación básica. Flujo completo: desde película pendiente a reserva de Party y aparición en calendario.
 
-MVP 3: música con catálogo y propuestas de altas, playlists y sala de cola compartida en tiempo real; integrar metadatos/enlaces oficiales antes de intentar reproducción. Documentar restricciones de cada proveedor.
+Antes de programar una integración: revisar documentación oficial vigente, condiciones de uso comercial, país, cuota, atribución, permisos de reproducción y restricciones de almacenamiento. Si no se puede verificar, marcar como pendiente de validación, construir interfaz y lógica de fallback y explicar al usuario qué falta. Nunca prometer streaming conjunto universal ni evadir DRM.
+11. Experiencia y calidad
+- Búsqueda global con resultados por categoría, filtros y estados vacíos útiles.
+- Recomendaciones basadas inicialmente en intereses, favoritos y popularidad real; evitar inventar un motor de IA avanzado. Explicar por qué se recomienda algo.
+- Preferencias de idioma, tema y accesibilidad.
+- Horarios localizados por zona horaria del usuario.
+- Diseño inclusivo, mensajes de error comprensibles, botones operativos, feedback al guardar, formularios validados.
+- Imágenes con alt, lazy loading, optimización, placeholders y atribución cuando aplique.
+- Rendimiento razonable en teléfonos de gama media.
+- No usar datos reales de usuarios como contenido de demostración sin consentimiento.
+- Si una función aún no existe, ocultarla o mostrar claramente «Próximamente»; nunca hacer que parezca activa.
+12. Plan de implementación por fases
+Fase 0 — Auditoría: inspeccionar repositorio, tecnologías, archivos, imagen assets/juntopia, componentes existentes, Supabase y configuración. Presentar hallazgos y riesgos sin borrar trabajo.
 
-MVP 4: lector, Tinta Viva, Galería Viva, más categorías, mejoras de accesibilidad, Plus y pagos solo después de validar requisitos.
+Fase 1 — Identidad y entrada: tokens Bosque, temas claro/oscuro/sistema, landing, login, registro, recuperación de cuenta, rutas protegidas, seis avatares y onboarding.
 
-Futuro: integraciones autorizadas avanzadas, experiencias sincronizadas cuando sean legal y técnicamente posibles, aplicación Android/iOS que reutilice backend y lógica de negocio.
+Fase 2 — Interior visual: dashboard inspirado fielmente en la imagen, sidebar, búsqueda, categorías, recomendaciones, agenda, perfil, estados responsive; conectar a datos reales o seed claramente de demostración.
 
-Para cada módulo, la IA debe entregar: (1) qué construye y por qué; (2) componentes y rutas; (3) tablas, migraciones y RLS; (4) código real y configuración; (5) estados vacíos, carga y error; (6) pruebas; (7) cómo verificarlo manualmente; (8) limitaciones y próximos pasos. No afirmar que algo funciona sin implementarlo y probarlo. Si falta una credencial o autorización, construir la interfaz y el adaptador con estado «Pendiente de configurar», nunca simular una integración como real.
-14. Flujos de prueba obligatorios
-1. Visitante abre landing -> crea cuenta -> verifica correo -> elige uno de seis avatares -> personaliza -> selecciona intereses -> entra al dashboard.
-2. Usuario inicia sesión posteriormente -> recupera perfil, avatar, gustos, listas y agenda sin repetir onboarding.
-3. Busca una canción -> la encuentra o propone su alta -> la guarda -> califica -> etiqueta «Me produce serotonina» -> la agrega a una lista -> crea sala musical -> amigos proponen temas -> cola cambia en tiempo real.
-4. Busca una película -> marca «Quiero ver» -> recibe recomendación opt-in de Party -> reserva -> aparece en agenda -> conversa -> valora después.
-5. Usuario bloqueado no puede ver datos restringidos ni escribir en chats prohibidos; usuarios anónimos no acceden al interior; RLS lo impide incluso fuera de la interfaz.
-6. Cambia entre escritorio, tablet y móvil y entre modo claro, oscuro y automático sin perder datos ni funcionalidad.
-15. Instrucción final a la IA
-Construí Juntopia como un ecosistema conectado, no como una colección de páginas sueltas. Primero explicá el plan técnico y los supuestos, luego implementá por etapas comprobables. Preguntá solamente cuando una decisión sea imprescindible; en los demás casos proponé una opción sensata y documentala. Priorizá seguridad, experiencia real, claridad de navegación, persistencia, accesibilidad y cumplimiento de licencias. La esencia de Juntopia es: «No importa dónde estemos; importa lo que podemos hacer juntos».
+Fase 3 — Núcleo de contenido: esquema y RLS, fichas, búsqueda, categorías, bibliotecas, colecciones, estados, calificaciones, reseñas, etiquetas emocionales.
 
-Lo mas importante es que todo el backend funcione porque este proyecto le van a poner mucho enfasis a eso, sin embargo es full stack y tiene que tener su parte de frontend todo tiene que estar bien modulado y divido y donde dve ir cada cosa, las cosas pligrosas o contrasen los archivos necesarios y demas, y siempre haz commits automatico en github despues de cada cambio explicando cortamente que se hizo
+Fase 4 — Integraciones de catálogo: proveedores viables (por ejemplo MusicBrainz, Google Books/Open Library, IGDB), normalización, errores, fuentes y permisos; audiovisuales solo tras validar licencia.
+
+Fase 5 — Comunidad: perfiles, amistades, privacidad, chat, notificaciones, bloqueos, reportes y moderación.
+
+Fase 6 — Parties: creación, RSVP, agenda, chat en tiempo real, presencia, recordatorios, enlaces oficiales y modalidades autorizadas.
+
+Fase 7 — Creadores y extras: Tinta Viva, Galería Viva, clubs, propuestas de contenido, playlists, recomendaciones mejoradas y herramientas de colaboración.
+
+Fase 8 — Lanzamiento: pruebas, rendimiento, accesibilidad, seguridad, revisión legal de APIs y contenido, despliegue, documentación y monitoreo. Monetización solo cuando esté correctamente autorizada.
+
+Cada fase debe producir algo usable, probado y verificable, no solamente pantallas.
+13. Forma de trabajar de la IA desarrolladora
+1. Leer este archivo completo y la imagen assets/juntopia antes de tocar código.
+2. Auditar el proyecto y explicar qué ya existe, qué falta y qué puede reutilizarse.
+3. Proponer arquitectura, diseño de datos y plan incremental. Pedir credenciales solo cuando sean imprescindibles, explicando dónde configurarlas; jamás solicitar claves secretas para pegarlas en el código frontend o en el chat público.
+4. Empezar por la fase más pequeña que entregue valor; preservar archivos, datos y decisiones anteriores.
+5. Implementar componentes reales y reutilizables, navegación funcional, backend y estados de carga/error/vacío.
+6. No utilizar imágenes generadas arbitrariamente para sustituir la referencia de diseño; no copiar contenido protegido sin permiso.
+7. Probar compilación, lint, tipos y flujos críticos según herramientas del repositorio. No afirmar que se ejecutaron pruebas si no se ejecutaron.
+8. Al finalizar cada etapa, entregar: archivos cambiados, funciones operativas, pasos para probar, variables de entorno, migraciones necesarias, limitaciones, permisos pendientes y siguiente fase.
+9. Si algo es técnicamente o legalmente inviable, explicarlo y ofrecer una alternativa funcional en vez de simularlo.
+10. Priorizar que Juntopia se sienta como una comunidad real para hacer cosas juntos, con la estética Bosque de la imagen como identidad visual permanente.
+Instrucción de arranque lista para la IA
+Leé contexto.md completo y buscá en assets la imagen llamada juntopia (confirmá su ruta y extensión). Inspeccioná la imagen: es la referencia visual principal y obligatoria para el estilo Bosque de la aplicación. Revisá el proyecto existente antes de modificarlo. Quiero una plataforma React + TypeScript + Supabase completa, con landing pública, registro, seis avatares personalizables y dashboard privado que reproduzca la estética de la imagen mediante componentes funcionales y responsive. Todas las categorías deben conectarse con perfiles, colecciones, reseñas, amistades y Parties. Priorizá integraciones legales y alternativas gratuitas sin inventar reproducción ni permisos. Primero mostrame la auditoría, arquitectura, modelo de datos y plan de fases; luego implementá la fase 1, verificando cada resultado. Conservá lo ya desarrollado y avisame de cualquier credencial, licencia o limitación antes de depender de ella.
+
+
+
+
+algo importante es que todo el backend funcione porque este proyecto le van a poner mucho enfasis a eso, sin embargo es full stack y tiene que tener su parte de frontend todo tiene que estar bien modulado y divido y donde dve ir cada cosa, las cosas pligrosas o contrasen los archivos necesarios y demas, y siempre haz commits automatico en github despues de cada cambio explicando cortamente que hiciste, obviamente tiene que ser estetico tambien pero es fullstack sin  embargo todo la parte de backend tiene que estar seguro de que hace y que todo funcione.
+
