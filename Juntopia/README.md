@@ -9,7 +9,7 @@ Requiere Node.js 22.12 o superior (recomendado 24).
 ```powershell
 cd Juntopia
 npm.cmd ci
-Copy-Item .env.example .env.local
+Copy-Item frontend/.env.example frontend/.env.local
 # Completar la URL y clave publicable de Supabase.
 npm.cmd run dev
 ```
@@ -42,20 +42,40 @@ GitHub Actions ejecuta estas comprobaciones en pushes a Aiden/main y pull reques
 - Notificaciones reales, preferencias de tema por cuenta, descarga de datos propios, manejo de desconexión y errores.
 - Panel de moderación con roles internos, reportes y registro de decisiones. Nadie obtiene rol de moderador desde el cliente.
 
-## Arquitectura
+## Estructura modular
 
-`src/components`: interfaz compartida. `src/features`: acceso y onboarding. `src/pages`: módulos cargados bajo demanda. `src/hooks`: sesión, navegación, consultas, acciones y Realtime. `src/lib`: acceso a datos, validación y utilidades. `supabase/migrations`: backend versionado. `supabase/tests`: aislamiento y permisos. `tests`: utilidades y render. `scripts`: pruebas de integración descartables.
+```text
+Juntopia/
+??? frontend/                 # Navegador: React, CSS y cliente p?blico
+?   ??? src/app/              # Entrada, rutas y layout
+?   ??? src/modules/          # Funciones del producto por dominio
+?   ??? src/shared/           # UI com?n, hooks, transporte y dominio
+?   ??? tests/                # Pruebas de arquitectura, dominio y render
+?   ??? .env.example          # S?lo variables VITE_ publicables
+?   ??? package.json
+??? backend/                  # Supabase: negocio, seguridad y persistencia
+?   ??? supabase/migrations/  # Tablas, RLS, RPC, triggers y Storage
+?   ??? supabase/tests/       # Pruebas SQL de aislamiento
+?   ??? tests/integration/    # Pruebas reales de Auth/REST/Realtime/Storage
+?   ??? scripts/              # Preparaci?n de fixtures descartables
+?   ??? .env.example          # Configuraci?n del entorno backend
+?   ??? package.json
+??? docs/                     # Arquitectura, seguridad y verificaci?n
+??? package.json              # Orquesta los dos workspaces
+??? package-lock.json         # Un lockfile para instalaci?n reproducible
+```
 
-Ver [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md), [verificación](docs/VERIFICACION.md) y [backend](supabase/README.md).
+M?dulos del frontend: auth, home, catalog, library, collections, community, parties, creators, profile y moderation. Cada m?dulo tiene un index.js p?blico y sus p?ginas/componentes propios. La capa compartida no depende de m?dulos ni importa c?digo del backend; las pruebas verifican esos l?mites.
 
-## Configuración y límites reales de lanzamiento
+El backend se ejecuta en Supabase. La autorizaci?n, cupos, integridad, moderaci?n y archivos privados est?n en PostgreSQL/RLS/RPC/Storage. frontend/src/shared/data es un cliente de ese backend, no el lugar donde se conceden permisos. No hay un servidor Express adicional.
 
-1. En Supabase Auth, revisar Site URL y Redirect URLs para `http://localhost:3000` y el dominio definitivo. Usar SMTP propio para entrega a personas ajenas al equipo, configurar remitente, límites y protección antiabuso. El código de registro está habilitado; no se verificó entrega de correos reales.
-2. Designar moderadores desde administración, agregando su UUID a `private.moderators`. No se asignan roles automáticamente ni mediante user_metadata.
-3. Los textos de reglas y privacidad son de una beta y requieren datos del responsable, contacto, retención y revisión antes del lanzamiento público.
-4. La eliminación completa de cuenta continúa siendo administrativa en Supabase; no se muestra un botón que finja eliminarla. Requiere revocar sesiones y retirar también los archivos del usuario.
-5. Catálogos externos, reproducción autorizada, lectores EPUB/PDF, chats grupales independientes de Parties, notificaciones push, pagos y anuncios no están integrados. El núcleo social funciona con fichas de enlaces oficiales y creaciones propias, sin depender de estas integraciones.
-6. La búsqueda muestra hasta 200 fichas recientes; otros listados hasta 100/200 registros. Los chats muestran los últimos 100 mensajes. El crecimiento requiere paginación adicional y revisión de costes.
-7. Verificación visual interactiva pendiente: el host de navegador no estaba disponible y la aprobación para Chrome venció. Se verificaron build, lint, render y API, sin afirmar una prueba visual que no se pudo realizar.
+Comandos independientes desde Juntopia:
 
-No se considera esta beta un lanzamiento público completo con todas las integraciones del documento de visión.
+```powershell
+npm.cmd run dev --workspace @juntopia/frontend
+npm.cmd run build --workspace @juntopia/frontend
+npm.cmd run lint --workspace @juntopia/backend
+npm.cmd run check:backend
+```
+
+Ver [frontend](frontend/README.md), [backend](backend/README.md), [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md) y [verificaci?n](docs/VERIFICACION.md).

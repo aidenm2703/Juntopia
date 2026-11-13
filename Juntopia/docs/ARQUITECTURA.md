@@ -1,32 +1,31 @@
-﻿# Arquitectura actual
+﻿# Arquitectura modular de Juntopia
 
-## Decisión de stack
+El proyecto usa JavaScript y dos workspaces npm independientes: frontend y backend. El package.json de Juntopia sólo orquesta comandos; cada workspace declara sus dependencias y configuración. Un lockfile común permite npm ci desde Juntopia.
 
-JavaScript, React y Vite, conservando el framework inicial. La instrucción más reciente del usuario reemplaza TypeScript. No hay fuentes .ts/.tsx ni compilador TypeScript como dependencia directa. Los tipos transitivos que traigan bibliotecas no forman parte del código de la aplicación.
+## Frontend
 
-## Identidad
+app compone la aplicación, navegación y layout. modules agrupa auth, home, catalog, library, collections, community, parties, creators, profile y moderation. Cada módulo tiene una entrada pública index.js y sus páginas/componentes. Parties separa listado, formulario, sala, cola, tarjeta y presencia.
 
-Referencia inspeccionada: src/assets/Juntopia.png. Bosque profundo, musgo, crema, luz cálida, bordes oliva y paneles redondeados. Se reconstruyó con componentes, CSS y SVG; no se usa la imagen de referencia como fondo ni se copian sus ejemplos como datos reales.
+shared contiene únicamente piezas reutilizables. Los componentes comunes no importan módulos. El transporte, la conexión Supabase, Storage y exportación están separados dentro de shared/data. Esa capa es un cliente de navegador, no un backend: no contiene secretos ni decide permisos.
 
-## Separación de responsabilidades
+## Backend
 
-- La aplicación React se ocupa de interfaz y estado; las páginas se cargan bajo demanda.
-- Auth gestiona las credenciales. El navegador sólo utiliza la clave publicable.
-- PostgreSQL valida integridad, privacidad y propiedad con RLS. Los controles visuales no son autorización.
-- Las funciones privadas privilegiadas tienen search_path vacío, permisos explícitos y comprobaciones de identidad. Los endpoints RPC públicos son wrappers SECURITY INVOKER.
-- Storage es privado; los enlaces firmados de obras autorizadas duran 60 segundos. Una obra privada no habilita acceso a otros usuarios por conocer su ruta.
-- Realtime difunde cambios sujetos a políticas. Se recargan datos al reconectar, enfocar y cada 30 segundos como respaldo.
+backend/supabase/migrations contiene tablas, restricciones, índices, RLS, funciones RPC, triggers, políticas Storage y publicación Realtime. El código se ejecuta en los servicios Supabase. backend/supabase/tests contiene pruebas SQL. backend/tests/integration contiene pruebas contra la API; backend/scripts prepara cuentas descartables.
 
-## Datos
+Las reglas de propiedad y privacidad, RSVP con bloqueo de fila, moderación y acceso a archivos se mantienen en el servidor. No se duplican en un servidor Express. Las migraciones históricas son inmutables y conservan exactamente su contenido tras el movimiento.
 
-profiles conserva el perfil privado y progreso; member_cards comparte sólo lo que el usuario habilita. save_profile guarda ambos atómicamente. policy_acceptances registra versión y hora del servidor. user_settings guarda preferencias.
+## Dependencias permitidas
 
-categories y content_items separan catálogo de user_content_status, reviews, collections y collection_items. Las fichas contienen metadatos originales y enlaces a fuentes oficiales.
+- app puede componer módulos y shared.
+- modules puede usar shared y las interfaces de otros dominios.
+- shared no puede depender de app/modules ni del backend.
+- frontend no puede importar archivos de backend ni módulos node:.
+- backend no puede importar React, Vite ni fuentes de frontend.
 
-friendships, blocks, conversations y messages definen relaciones y mensajes privados. parties, invites, attendees, bans, messages, queue, votes y presence modelan encuentros. El RSVP bloquea la fila de la Party antes de contar participantes para impedir sobrecupos concurrentes.
+Estas fronteras se verifican en frontend/tests/architecture.test.js. GitHub Actions tiene trabajos separados para frontend y backend.
 
-creator_works y work_comments modelan creación original con borradores y publicación. reports y las tablas privadas de moderación dejan trazabilidad. notifications se genera desde triggers autorizados.
+## Configuración
 
-## Alcance de esta beta
+frontend/.env.local sólo contiene variables VITE_ publicables. backend/.env.local es independiente y usa SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY para integración. Los secretos futuros de proveedores deben configurarse únicamente en backend/Edge Functions. Ambos archivos están ignorados por Git.
 
-La plataforma social está conectada al backend. No se simula streaming, pagos, usuarios, amistades o recomendaciones. Los términos definitivos, entrega de correos, eliminación automatizada de cuentas y proveedores externos son dependencias de lanzamiento, detalladas en README.md.
+La referencia visual se conserva en frontend/src/shared/assets/Juntopia.png. La reorganización preserva los flujos existentes y no modifica el esquema ni los datos del proyecto Supabase.
