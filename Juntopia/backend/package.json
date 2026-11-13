@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "lint": "eslint scripts tests",
-    "check": "node --check scripts/prepare-smoke.mjs && node --check tests/integration/api-smoke.mjs",
+    "lint": "eslint src scripts tests",
+    "check": "node --check src/server.js && node --check scripts/prepare-smoke.mjs && node --check tests/integration/api-smoke.mjs",
     "test:prepare": "node scripts/prepare-smoke.mjs",
-    "test:integration": "node tests/integration/api-smoke.mjs"
+    "test:integration": "node tests/integration/api-smoke.mjs",
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test tests/unit/*.test.js tests/http/*.test.js",
+    "test:http:integration": "node tests/integration/http-smoke.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0"

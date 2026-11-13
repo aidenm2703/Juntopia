@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: Juntopia/package-lock.json
       - run: npm ci
       - run: npm run lint --workspace @juntopia/frontend
-      - run: npm test
+      - run: npm test --workspace @juntopia/frontend
       - run: npm run test:render
       - run: npm run build
   backend:
@@ -38,3 +38,4 @@ jobs:
       - run: npm ci
       - run: npm run lint --workspace @juntopia/backend
       - run: npm run check:backend
+      - run: npm test --workspace @juntopia/backend
