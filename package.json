@@ -1,0 +1,13 @@
+{
+  "name": "juntopia-launcher",
+  "private": true,
+  "scripts": {
+    "dev": "node Juntopia/scripts/dev.mjs",
+    "dev:frontend": "npm --prefix Juntopia run dev:frontend",
+    "dev:backend": "npm --prefix Juntopia run dev:backend",
+    "setup": "npm --prefix Juntopia ci",
+    "build": "npm --prefix Juntopia run build",
+    "test": "npm --prefix Juntopia test",
+    "lint": "npm --prefix Juntopia run lint"
+  }
+}

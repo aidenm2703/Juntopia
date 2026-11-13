@@ -95,3 +95,4 @@ Ver [frontend](frontend/README.md), [backend](backend/README.md), [arquitectura]
 Para pruebas con el correo abierto en otro dispositivo, el formulario permite pegar el enlace privado en el computador y verificarlo con el SDK de Supabase, sin seguir la URL localhost. Ver [correos locales](docs/CORREOS_LOCALES.md).
 
 Las nuevas contraseñas requieren mínimo ocho caracteres y una mayúscula, comprobados en el formulario y la API Node. El ingreso sigue aceptando contraseñas anteriores. Para abrir la aplicación directamente desde un teléfono se requiere una URL publicada; localhost pertenece al dispositivo que abre el correo.
+El repositorio también tiene un package.json de acceso en la carpeta superior que contiene contexto.md. Desde allí funciona el mismo npm.cmd run dev; si los servidores ya están abiertos, se muestran las URLs en vez de lanzar duplicados.

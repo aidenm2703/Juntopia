@@ -42,3 +42,8 @@ Se añadieron pruebas de enlaces copiados entre dispositivos y política de cont
 La integración HTTP real pasó catorce comprobaciones, incluyendo el cambio a una contraseña de ocho caracteres con mayúscula y un inicio de sesión real con ella. Otra prueba del frontend importó una sesión real desde una URL de retorno de localhost y confirmó al usuario correcto mediante Supabase Auth, sin navegar a esa URL. Se retiraron las cuentas descartables al finalizar.
 
 No se enviaron nuevos correos a una bandeja real ni se automatizó la interfaz del teléfono. No se modificó la configuración administrativa remota de Supabase: la CLI no tiene sesión administrativa. La solución local utiliza los enlaces ya emitidos y el SDK; los detalles están en CORREOS_LOCALES.md.
+## Arranque desde la carpeta del repositorio
+
+La raíz que contiene contexto.md ahora tiene package.json con comandos de acceso. npm.cmd run dev funciona desde esa raíz o desde Juntopia. npm.cmd run setup instala los workspaces desde la raíz cuando faltan dependencias.
+
+El lanzador comprueba los puertos antes de crear procesos. Reutiliza servidores reconocidos de Juntopia, muestra sus URLs y rechaza servicios ajenos sin terminarlos. Se verificó el arranque desde la raíz con el frontend ya abierto y el backend detenido: el backend arrancó y ambos respondieron.
