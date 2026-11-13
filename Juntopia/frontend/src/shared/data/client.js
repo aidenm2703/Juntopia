@@ -13,6 +13,23 @@ if (url && typeof window !== "undefined")
     recoveryStorage: {
       removeItem: (key) => window.sessionStorage.removeItem(key),
     },
+    sessionStorage: {
+      getItem: (key) => window.sessionStorage.getItem(key),
+    },
   });
 export const supabase =
-  url && key ? createClient(url, key, { auth: { persistSession } }) : null;
+  import.meta.hot?.data.supabase ||
+  (url && key
+    ? createClient(url, key, {
+        auth: {
+          persistSession: true,
+          ...(persistSession || typeof window === "undefined"
+            ? {}
+            : { storage: window.sessionStorage }),
+        },
+      })
+    : null);
+if (import.meta.hot)
+  import.meta.hot.dispose((data) => {
+    data.supabase = supabase;
+  });

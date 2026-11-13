@@ -6,6 +6,7 @@ export function prepareSessionStartup({
   projectUrl,
   storage,
   recoveryStorage,
+  sessionStorage,
   location,
   history,
 }) {
@@ -14,6 +15,11 @@ export function prepareSessionStartup({
     storage.removeItem(authStorageKey(projectUrl));
   } catch {
     /* Storage may be unavailable. */
+  }
+  try {
+    if (sessionStorage?.getItem(authStorageKey(projectUrl))) return;
+  } catch {
+    /* Continue without browser storage. */
   }
   const search = new URLSearchParams(location.search || "");
   const callback = new URLSearchParams(

@@ -1,7 +1,12 @@
 import { errorMessage } from "../../../shared/domain/index.js";
 import { passwordHint } from "./passwordPolicy.js";
 const messages = {
-  invalid_credentials: "El correo o la contraseña no son correctos.",
+  invalid_credentials:
+    "El correo o la contraseña no son correctos. Volver a registrar un correo existente no cambia su contraseña. Si no la recordás, usá «Olvidé mi contraseña».",
+  otp_expired:
+    "El enlace venció o ya se usó. Si tu correo ya está confirmado, ingresá con tu contraseña o recuperala. Si aún falta confirmarlo, pedí un nuevo enlace.",
+  access_denied:
+    "No pudimos validar ese enlace. Pedí uno nuevo; los enlaces viejos pueden estar vencidos o ya usados.",
   email_not_confirmed:
     "Confirmá tu correo antes de ingresar. Podés pegar el enlace del correo en este computador.",
   user_already_exists:
@@ -18,5 +23,14 @@ const messages = {
   PASSWORD_POLICY: passwordHint,
 };
 export function authErrorMessage(error) {
-  return messages[error?.code] || errorMessage(error);
+  return messages[error?.code || error?.details?.code] || errorMessage(error);
+}
+export function emailCallbackError(location) {
+  const params = new URLSearchParams(
+    location.hash.startsWith("#/") ? "" : location.hash.slice(1),
+  );
+  const search = new URLSearchParams(location.search || "");
+  const code = params.get("error_code") || search.get("error_code");
+  const error = params.get("error") || search.get("error");
+  return code || error ? authErrorMessage({ code: code || error }) : "";
 }

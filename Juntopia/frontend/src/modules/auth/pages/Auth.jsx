@@ -14,6 +14,32 @@ export function Auth({ mode, close }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  async function resendConfirmation(event) {
+    const emailInput = event.currentTarget.form.elements.email;
+    if (!emailInput.reportValidity() || !supabase || busy) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: emailInput.value.trim(),
+        options: {
+          emailRedirectTo: authRedirectUrl(
+            window.location,
+            import.meta.env.VITE_AUTH_REDIRECT_URL,
+          ),
+        },
+      });
+      if (error) throw error;
+      setMessage(
+        "Si la cuenta está pendiente de confirmación, recibirás un enlace nuevo. Revisá spam y usá únicamente el último correo. Si ya está confirmada, ingresá o recuperá tu contraseña.",
+      );
+    } catch (error) {
+      setMessage(authErrorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
   async function submit(event) {
     event.preventDefault();
     if (!supabase || busy) return;
@@ -179,6 +205,16 @@ export function Auth({ mode, close }) {
             }}
           >
             Volver a enviar un enlace
+          </button>
+        )}
+        {["register", "login"].includes(mode) && (
+          <button
+            type="button"
+            className="text-button"
+            disabled={busy || !supabase}
+            onClick={resendConfirmation}
+          >
+            Reenviar confirmación de correo
           </button>
         )}
       </form>

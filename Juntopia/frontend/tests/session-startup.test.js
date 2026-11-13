@@ -55,3 +55,11 @@ test("remember-session option preserves ordinary navigation and stored sessions"
   assert.equal(f.values.has("sb-project-auth-token"), true);
   assert.equal(f.state.target, null);
 });
+test("reloading a signed-in tab preserves its route and recovery flow", () => {
+  const f = fixture("#/library");
+  f.args.sessionStorage = { getItem: () => "current tab session" };
+  prepareSessionStartup(f.args);
+  assert.equal(f.state.target, null);
+  assert.equal(f.recovery.get("juntopia-password-recovery"), "true");
+  assert.equal(f.values.has("sb-project-auth-token"), false);
+});

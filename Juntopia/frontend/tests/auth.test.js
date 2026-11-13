@@ -1,7 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { validPassword } from "../src/modules/auth/services/passwordPolicy.js";
-import { authErrorMessage } from "../src/modules/auth/services/authErrors.js";
+import {
+  authErrorMessage,
+  emailCallbackError,
+} from "../src/modules/auth/services/authErrors.js";
 import { errorMessage } from "../src/shared/domain/index.js";
 import {
   authRedirectUrl,
@@ -12,6 +15,27 @@ const options = {
   projectUrl: "https://project.supabase.co",
   appUrl: "http://localhost:3000",
 };
+test("expired email callbacks explain recovery instead of silently showing login", () => {
+  assert.match(
+    emailCallbackError({
+      hash: "#error=access_denied&error_code=otp_expired",
+      search: "",
+    }),
+    /venció o ya se usó/,
+  );
+  assert.match(
+    emailCallbackError({ hash: "#/login", search: "?error_code=otp_expired" }),
+    /nuevo enlace/,
+  );
+  assert.equal(
+    emailCallbackError({ hash: "#access_token=private", search: "" }),
+    "",
+  );
+  assert.doesNotMatch(
+    emailCallbackError({ hash: "#error=PRIVATE_PROVIDER_DETAILS", search: "" }),
+    /PRIVATE_PROVIDER/,
+  );
+});
 test("existing accounts and email restrictions never look like generic connection failures", () => {
   assert.match(
     authErrorMessage({ code: "user_already_exists" }),

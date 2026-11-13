@@ -28,3 +28,11 @@ El proyecto remoto tiene además sus propios controles de longitud y caracteres 
 
 Referencias oficiales: [URLs de retorno](https://supabase.com/docs/guides/auth/redirect-urls), [seguridad de contraseñas](https://supabase.com/docs/guides/auth/password-security).
 Si el correo ya está confirmado, usar «Ya tengo cuenta» e ingresar con la contraseña elegida originalmente. Reiniciar los servidores o empezar en registro no elimina esa cuenta. Ante una contraseña olvidada, usar recuperación en lugar de intentar registrar de nuevo el mismo correo.
+
+## Confirmación, reenvío y sesión de la pestaña
+
+Registro e ingreso incluyen «Reenviar confirmación de correo». Escribí el correo antes de pulsarlo. Si la cuenta ya está confirmada, no necesita otro enlace de confirmación: usá ingreso o «Olvidé mi contraseña». Intentar registrar otra vez el mismo correo no cambia la contraseña anterior; la API reconoce también la respuesta ofuscada de Supabase con identidades vacías para evitar anunciar un envío inexistente.
+
+Los enlaces vencidos o ya usados muestran un aviso específico al regresar a la aplicación. Usá el último enlace y no compartas su dirección. Un correo antiguo no sirve para repetir una confirmación ni para cambiar la contraseña.
+
+Con VITE_AUTH_PERSIST_SESSION=false la sesión se guarda en sessionStorage: sobrevive a la recarga de la misma pestaña, y una pestaña nueva sin sesión comienza en registro. Con true se conserva entre visitas mediante el almacenamiento predeterminado del SDK. El cliente se reutiliza durante las actualizaciones de Vite para evitar varias instancias de Auth compitiendo.

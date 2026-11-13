@@ -56,6 +56,10 @@ export async function register(config, input, makeClient = createClient) {
     options: { emailRedirectTo: redirect.href },
   });
   if (error) throw authFailure(error);
+  // Supabase obscures repeat signups with an empty identities list. No email
+  // was sent and the existing password was not changed.
+  if (!data.session && data.user?.identities?.length === 0)
+    throw authFailure({ code: "user_already_exists" });
   return {
     session: data.session,
     user: data.user ? { id: data.user.id } : null,

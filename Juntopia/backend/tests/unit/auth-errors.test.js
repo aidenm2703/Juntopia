@@ -58,6 +58,32 @@ test("SMTP, limits and unknown provider errors keep sanitized codes and explanat
   assert.equal(unknown.code, "unexpected_failure");
   assert.doesNotMatch(unknown.message, /SECRET/);
 });
+test("obfuscated repeat signup never claims another confirmation email was sent", async () => {
+  await assert.rejects(
+    register(
+      {
+        origins: ["http://localhost:3000"],
+        supabaseUrl: "https://project.supabase.co",
+        supabaseKey: "public",
+      },
+      {
+        email: "test@example.invalid",
+        password: "Password8",
+        accepted: true,
+        redirectTo: "http://localhost:3000/",
+      },
+      () => ({
+        auth: {
+          signUp: async () => ({
+            data: { user: { id: "obfuscated", identities: [] }, session: null },
+            error: null,
+          }),
+        },
+      }),
+    ),
+    (error) => error.code === "user_already_exists",
+  );
+});
 test("Auth outage is service-unavailable, never an invalid user session", async () => {
   const authenticate = createAuthenticator({}, () => ({
     auth: {
