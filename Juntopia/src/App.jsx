@@ -68,7 +68,7 @@ function App() {
   return <main className={`app-shell ${isLightMode ? 'light-mode' : ''}`}>
     <div className="ambient ambient-one" /><div className="ambient ambient-two" /><div className="grid-overlay" />
     <aside className="sidebar glass-panel">
-      <a className="brand" href="#inicio" aria-label="Juntopia, inicio"><img src={logo} alt="Juntopia" /></a>
+      <a className="brand" href="#top" aria-label="Ir a la página de inicio" onClick={(event) => { event.preventDefault(); setView('landing') }}><img src={logo} alt="Juntopia" /></a>
       <nav className="primary-nav" aria-label="Navegación principal">{nav.map(([icon, item]) => <button key={item} className={activeNav === item ? 'nav-item active' : 'nav-item'} onClick={() => setActiveNav(item)}><span aria-hidden="true">{icon}</span>{item}</button>)}</nav>
       <div className="sidebar-rule" /><button className="nav-item"><span>◉</span>Mi perfil</button><button className="nav-item"><span>⚙</span>Configuración</button>
       <section className="plus-card"><span className="sparkle">✦</span><p className="eyebrow">JUNTOPIA PLUS</p><h2>Tu club, sin límites.</h2><p>Personaliza tus colecciones y crea Parties especiales.</p><button>Mejorar plan <span>↗</span></button></section>
