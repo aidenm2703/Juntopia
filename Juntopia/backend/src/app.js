@@ -13,12 +13,19 @@ import { callRpc } from "./controllers/rpc.controller.js";
 import { accountExportService } from "./modules/account/export.service.js";
 import { createStorageService } from "./modules/creators/storage.service.js";
 import { register, changePassword } from "./modules/auth/auth.service.js";
+import { createPhotoService } from "./modules/account/photo.service.js";
+import { createDiscoveryService } from "./modules/catalog/discovery.service.js";
+import { createAiService } from "./modules/catalog/ai.service.js";
 export function createApp({
   config,
   authenticate = createAuthenticator(config),
 }) {
   const limit = createRateLimiter(config.requestsPerMinute);
   const registrationLimit = createRateLimiter(10);
+  const discovery = createDiscoveryService();
+  const assistant = createAiService(config, discovery);
+  const aiLimit = createRateLimiter(12);
+  const searchLimit = createRateLimiter(20);
   return async (request, response) => {
     response.setHeader("X-Request-Id", randomUUID());
     try {
@@ -57,6 +64,11 @@ export function createApp({
         "/api/creators/files",
         "/api/creators/files/signed",
         "/api/auth/password",
+        "/api/account/photo",
+        "/api/account/photo/signed",
+        "/api/catalog/search",
+        "/api/catalog/import",
+        "/api/catalog/assistant",
       ].includes(url.pathname);
       if (!rpc && !custom && (!definition || segments.length > 4))
         throw new ApiError(404, "NOT_FOUND", "Ruta no disponible.");
@@ -64,7 +76,52 @@ export function createApp({
       limit(context.user.id);
       const readJson = () => readBody(request, config.jsonLimit);
       let data;
-      if (url.pathname === "/api/auth/password") {
+      if (
+        url.pathname === "/api/catalog/assistant" &&
+        request.method === "POST"
+      ) {
+        aiLimit(context.user.id);
+        const input = await readJson();
+        if (!input || typeof input !== "object" || Array.isArray(input))
+          throw new ApiError(400, "INVALID_AI_REQUEST", "Solicitud no válida.");
+        data = await assistant.suggest(context, input);
+      } else if (
+        url.pathname === "/api/catalog/search" &&
+        request.method === "GET"
+      ) {
+        searchLimit(context.user.id);
+        data = await discovery.search(
+          url.searchParams.get("q"),
+          url.searchParams.get("category") || "",
+        );
+      } else if (
+        url.pathname === "/api/catalog/import" &&
+        request.method === "POST"
+      ) {
+        const body = await readJson();
+        data = await discovery.import(context, body?.external_id);
+      } else if (url.pathname.startsWith("/api/account/photo")) {
+        const photos = createPhotoService(context);
+        if (url.pathname.endsWith("/signed") && request.method === "POST")
+          data = await photos.signed((await readJson()).path);
+        else if (
+          url.pathname === "/api/account/photo" &&
+          request.method === "POST"
+        )
+          data = await photos.upload(
+            await readBody(request, 2097152, true),
+            request.headers["content-type"]?.split(";")[0],
+          );
+        else if (
+          url.pathname === "/api/account/photo" &&
+          request.method === "DELETE"
+        )
+          data = await photos.remove((await readJson()).path);
+        else
+          throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
+      } else if (url.pathname.startsWith("/api/catalog/") && custom) {
+        throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
+      } else if (url.pathname === "/api/auth/password") {
         if (request.method !== "POST")
           throw new ApiError(405, "METHOD_NOT_ALLOWED", "Método no permitido.");
         data = await changePassword(config, context, await readJson());

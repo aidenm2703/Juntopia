@@ -71,6 +71,23 @@ test("health is public; resource routes reject unauthenticated and foreign-origi
     403,
   );
   assert.equal((await send("/api/private/moderators")).status, 404);
+  for (const path of [
+    "/api/catalog/assistant",
+    "/api/catalog/search",
+    "/api/catalog/import",
+    "/api/account/photo",
+    "/api/account/photo/signed",
+  ])
+    assert.equal(
+      (await send(path, "POST", {}, { Authorization: "" })).status,
+      401,
+    );
+  assert.equal((await send("/api/catalog/search?q=x")).status, 400);
+  assert.equal(
+    (await send("/api/catalog/import", "POST", { external_id: "untrusted" }))
+      .status,
+    410,
+  );
 });
 test("unsafe queries, mass assignment, unfiltered writes and arbitrary RPCs never reach the DB", async (t) => {
   const { send } = await fixture(t);

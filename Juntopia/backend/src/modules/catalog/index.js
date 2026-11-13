@@ -9,7 +9,7 @@ export const catalogModule = {
       order: "name",
     }),
     content_items: resource(
-      "id created_by category title author description official_url source created_at",
+      "id created_by category title author description official_url source image_url created_at",
       {
         operations: ["list", "one", "insert", "remove"],
         write:

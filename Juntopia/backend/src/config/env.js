@@ -28,5 +28,9 @@ export function loadConfig(env = process.env) {
     jsonLimit: 512 * 1024,
     uploadLimit: 5 * 1024 * 1024,
     requestsPerMinute: 240,
+    geminiKey: env.GEMINI_API_KEY || "",
+    geminiModel: /^[a-z0-9.-]+$/.test(env.GEMINI_MODEL || "")
+      ? env.GEMINI_MODEL
+      : "gemini-3.5-flash-lite",
   });
 }
