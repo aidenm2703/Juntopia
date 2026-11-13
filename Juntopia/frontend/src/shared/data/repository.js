@@ -1,44 +1,41 @@
-import { supabase } from "./client.js";
-import { result } from "./result.js";
+import { request } from "./http.js";
+import { resourcePaths, rpcPaths } from "./routes.js";
+function route(table) {
+  const path = resourcePaths[table];
+  if (!path) throw new Error("Unknown resource");
+  return path;
+}
 export const repository = {
-  list(
-    table,
-    {
-      filters = {},
-      order = "created_at",
-      ascending = false,
-      limit = 100,
-      select = "*",
-    } = {},
-  ) {
-    let query = supabase.from(table).select(select);
-    for (const [column, value] of Object.entries(filters))
-      query = query.eq(column, value);
-    if (order) query = query.order(order, { ascending });
-    return result(query.limit(limit));
-  },
-  one(table, id) {
-    return result(supabase.from(table).select("*").eq("id", id).maybeSingle());
-  },
-  insert(table, values) {
-    return result(supabase.from(table).insert(values).select().single());
-  },
-  upsert(table, values, onConflict) {
-    return result(
-      supabase.from(table).upsert(values, { onConflict }).select().single(),
+  list(table, options = {}) {
+    return request(
+      route(table) +
+        "?" +
+        new URLSearchParams({ options: JSON.stringify(options) }),
     );
   },
+  one(table, id) {
+    return request(route(table) + "/" + encodeURIComponent(id));
+  },
+  insert(table, values) {
+    return request(route(table), { method: "POST", body: values });
+  },
+  upsert(table, values, onConflict) {
+    return request(route(table), {
+      method: "PUT",
+      body: { values, onConflict },
+    });
+  },
   update(table, values, filters) {
-    let q = supabase.from(table).update(values);
-    for (const [key, value] of Object.entries(filters)) q = q.eq(key, value);
-    return result(q.select());
+    return request(route(table), {
+      method: "PATCH",
+      body: { values, filters },
+    });
   },
   remove(table, filters) {
-    let q = supabase.from(table).delete();
-    for (const [key, value] of Object.entries(filters)) q = q.eq(key, value);
-    return result(q);
+    return request(route(table), { method: "DELETE", body: filters });
   },
   rpc(name, values = {}) {
-    return result(supabase.rpc(name, values));
+    if (!rpcPaths[name]) throw new Error("Unknown action");
+    return request(rpcPaths[name], { method: "POST", body: values });
   },
 };

@@ -55,7 +55,7 @@ test("backend has no React or Vite dependency and cannot import frontend source"
       pkg.dependencies?.[name] || pkg.devDependencies?.[name],
       undefined,
     );
-  for (const directory of ["scripts", "tests"])
+  for (const directory of ["src", "scripts", "tests"])
     for (const file of files(path.join(backend, directory)))
       for (const spec of imports(file))
         if (spec.startsWith("."))
@@ -72,4 +72,25 @@ test("each functional module exposes a public entry point", () => {
         existsSync(path.join(directory, item.name, "index.js")),
         `${item.name} is missing its public module entry`,
       );
+});
+test("browser data access goes through the backend HTTP API", () => {
+  for (const file of files(path.join(frontend, "src"))) {
+    assert.doesNotMatch(
+      readFileSync(file, "utf8"),
+      /\bsupabase\s*\.\s*(?:from|rpc|storage)\b/,
+      `${file} accesses persistence directly instead of the backend`,
+    );
+  }
+  for (const entry of [
+    "src/server.js",
+    "src/app.js",
+    "src/routes/index.js",
+    "src/controllers/resource.controller.js",
+    "src/services/resource.service.js",
+    "src/database/repositories/resource.repository.js",
+  ])
+    assert.ok(
+      existsSync(path.join(backend, entry)),
+      `Missing backend source layer: ${entry}`,
+    );
 });

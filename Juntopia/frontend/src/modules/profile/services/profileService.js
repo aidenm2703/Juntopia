@@ -1,23 +1,14 @@
-﻿import { supabase } from "../../../shared/data/client.js";
+import { repository } from "../../../shared/data/repository.js";
 import { emptyProfile } from "../../../shared/domain/profile.js";
 export {
   avatarNames,
   interests,
   emptyProfile,
 } from "../../../shared/domain/profile.js";
+
 export async function loadProfile(id) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw error;
-  return data ?? emptyProfile(id);
+  return (await repository.one("profiles", id)) ?? emptyProfile(id);
 }
 export async function saveProfile(profile, visible = false) {
-  const { error } = await supabase.rpc("save_profile", {
-    profile_data: profile,
-    visible,
-  });
-  if (error) throw error;
+  return repository.rpc("save_profile", { profile_data: profile, visible });
 }

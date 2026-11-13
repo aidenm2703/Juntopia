@@ -8,14 +8,16 @@
     "backend"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @juntopia/frontend",
+    "dev": "node scripts/dev.mjs",
     "build": "npm run build --workspace @juntopia/frontend",
     "preview": "npm run preview --workspace @juntopia/frontend",
     "lint": "npm run lint --workspaces",
-    "test": "npm test --workspace @juntopia/frontend",
+    "test": "npm test --workspaces",
     "test:render": "npm run test:render --workspace @juntopia/frontend",
     "check:backend": "npm run check --workspace @juntopia/backend",
-    "format": "prettier --write frontend/src frontend/tests backend/scripts backend/tests"
+    "format": "prettier --write frontend/src frontend/tests backend/src backend/scripts backend/tests scripts",
+    "dev:frontend": "npm run dev --workspace @juntopia/frontend",
+    "dev:backend": "npm run dev --workspace @juntopia/backend"
   },
   "devDependencies": {
     "prettier": "3.10.1"
