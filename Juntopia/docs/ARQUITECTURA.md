@@ -1,31 +1,33 @@
 ﻿# Arquitectura modular de Juntopia
 
-El proyecto usa JavaScript y dos workspaces npm independientes: frontend y backend. El package.json de Juntopia sólo orquesta comandos; cada workspace declara sus dependencias y configuración. Un lockfile común permite npm ci desde Juntopia.
+JavaScript con dos workspaces independientes. El frontend tiene su propio src y servidor de desarrollo; el backend tiene su propio src y API Node.js. El package.json raíz orquesta ambos procesos y un lockfile común hace reproducible la instalación.
 
 ## Frontend
 
-app compone la aplicación, navegación y layout. modules agrupa auth, home, catalog, library, collections, community, parties, creators, profile y moderation. Cada módulo tiene una entrada pública index.js y sus páginas/componentes. Parties separa listado, formulario, sala, cola, tarjeta y presencia.
+frontend/src/app compone navegación y layout. frontend/src/modules agrupa las funciones del producto por dominio. frontend/src/shared contiene interfaz, hooks, dominio y clientes HTTP reutilizables.
 
-shared contiene únicamente piezas reutilizables. Los componentes comunes no importan módulos. El transporte, la conexión Supabase, Storage y exportación están separados dentro de shared/data. Esa capa es un cliente de navegador, no un backend: no contiene secretos ni decide permisos.
+El navegador sólo se comunica con rutas explícitas de la API para datos, perfiles, exportación y archivos. El SDK público de Supabase se conserva para iniciar/cerrar sesión y recibir eventos Realtime. Ningún archivo de backend se importa en frontend.
 
 ## Backend
 
-backend/supabase/migrations contiene tablas, restricciones, índices, RLS, funciones RPC, triggers, políticas Storage y publicación Realtime. El código se ejecuta en los servicios Supabase. backend/supabase/tests contiene pruebas SQL. backend/tests/integration contiene pruebas contra la API; backend/scripts prepara cuentas descartables.
+backend/src/server.js inicia la API; app.js compone el manejo HTTP. config valida el entorno. middleware verifica las sesiones con Supabase Auth, CORS, tamaño de cuerpos y límites de solicitudes. routes registra las interfaces de los módulos account, catalog, library, community, parties, creators y moderation.
 
-Las reglas de propiedad y privacidad, RSVP con bloqueo de fila, moderación y acceso a archivos se mantienen en el servidor. No se duplican en un servidor Express. Las migraciones históricas son inmutables y conservan exactamente su contenido tras el movimiento.
+controllers interpreta solicitudes; services comprueba operaciones, filtros, propiedad explícita y campos permitidos; database/repositories realiza las consultas. Los servicios específicos de cuenta y creadores gestionan exportación y archivos.
 
-## Dependencias permitidas
+Cada petición crea un cliente Supabase con el JWT del usuario verificado y la clave publicable, sin compartir sesiones ni usar service_role. RLS permanece como control de autorización de la base. La API no permite acceder a tablas o RPC fuera de sus módulos.
 
-- app puede componer módulos y shared.
-- modules puede usar shared y las interfaces de otros dominios.
-- shared no puede depender de app/modules ni del backend.
-- frontend no puede importar archivos de backend ni módulos node:.
-- backend no puede importar React, Vite ni fuentes de frontend.
+backend/supabase contiene las migraciones, restricciones, RLS, transacciones de RSVP, auditoría, Storage y Realtime que se ejecutan en Supabase. Las migraciones históricas se conservan sin cambios. Las pruebas se dividen en unitarias, HTTP, integración real y SQL.
 
-Estas fronteras se verifican en frontend/tests/architecture.test.js. GitHub Actions tiene trabajos separados para frontend y backend.
+## Comunicación
 
-## Configuración
+Navegador React → /api del backend → middleware de sesión → ruta/controlador → servicio → repositorio → Supabase con RLS.
 
-frontend/.env.local sólo contiene variables VITE_ publicables. backend/.env.local es independiente y usa SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY para integración. Los secretos futuros de proveedores deben configurarse únicamente en backend/Edge Functions. Ambos archivos están ignorados por Git.
+En desarrollo Vite hace proxy desde localhost:3000/api al servidor Node 127.0.0.1:4000. En producción el operador configura un proxy HTTPS o una URL de API y CORS explícitos.
 
-La referencia visual se conserva en frontend/src/shared/assets/Juntopia.png. La reorganización preserva los flujos existentes y no modifica el esquema ni los datos del proyecto Supabase.
+## Reglas de dependencias
+
+app compone módulos; modules usa shared. shared no depende de módulos ni backend. backend no depende de React, Vite o archivos del frontend. Las pruebas de arquitectura verifican estas fronteras.
+
+frontend/.env.local contiene sólo variables VITE_ publicables. backend/.env.local es independiente. Los secretos futuros pertenecen exclusivamente al backend o a funciones de servidor; nunca se transfieren al navegador.
+
+La referencia visual se conserva en frontend/src/shared/assets/Juntopia.png. Esta reorganización añade una capa API real y no altera los datos ni el esquema remoto.

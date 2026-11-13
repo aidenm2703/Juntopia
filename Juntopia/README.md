@@ -1,81 +1,92 @@
 ﻿# Juntopia
 
-Aplicación web full stack en **JavaScript + React + Vite + Supabase**, desarrollada en la rama `Aiden`. La instrucción actual de JavaScript sustituye la propuesta anterior de TypeScript.
+Aplicación web en JavaScript con dos proyectos separados: frontend React/Vite y backend Node.js/Supabase. Desarrollo en la rama Aiden.
 
-## Arranque
+## Estructura
 
-Requiere Node.js 22.12 o superior (recomendado 24).
+```text
+Juntopia/
+├── frontend/
+│   ├── src/
+│   │   ├── app/             # Entrada, rutas y layout
+│   │   ├── modules/         # Funciones del producto
+│   │   └── shared/          # UI, hooks y cliente HTTP
+│   ├── tests/
+│   ├── .env.example
+│   └── package.json
+├── backend/
+│   ├── src/
+│   │   ├── server.js        # Inicio del servidor
+│   │   ├── app.js           # Composición de la API
+│   │   ├── config/
+│   │   ├── routes/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── database/        # Cliente y repositorios
+│   │   ├── middleware/
+│   │   ├── modules/         # Dominios de la API
+│   │   └── shared/
+│   ├── supabase/            # Migraciones, RLS y pruebas SQL
+│   ├── tests/               # Unitarias, HTTP e integración
+│   ├── scripts/
+│   ├── .env.example
+│   └── package.json
+├── docs/
+├── scripts/dev.mjs          # Arranca ambos procesos
+├── package.json            # Orquesta los workspaces
+└── package-lock.json
+```
+
+El flujo de datos es frontend → API Node → controlador → servicio → repositorio → Supabase con RLS. Auth y Realtime conservan el SDK público de Supabase en el navegador. El frontend no importa archivos del backend ni consulta tablas, RPC o Storage directamente.
+
+## Ejecutar
+
+Requiere Node.js 22.12 o superior; recomendado 24.
 
 ```powershell
 cd Juntopia
 npm.cmd ci
 Copy-Item frontend/.env.example frontend/.env.local
-# Completar la URL y clave publicable de Supabase.
+Copy-Item backend/.env.example backend/.env.local
+# Completar la URL y clave publicable en cada entorno.
 npm.cmd run dev
 ```
 
-Abrir **http://localhost:3000**. Si `.env.local` ya está configurado, conservarlo y omitir Copy-Item. Este equipo apunta al proyecto Juntopia `czdldzleooqoqerxmmkk`. Ninguna clave secreta se incluye en el frontend ni en Git.
+Si los archivos locales ya están configurados, conservarlos y omitir Copy-Item. En este equipo se conservó el proyecto Juntopia czdldzleooqoqerxmmkk. Los archivos locales no se suben a Git.
+
+Frontend: http://localhost:3000. Backend: http://127.0.0.1:4000. Vite redirige /api al backend. Si alguno ya está abierto, cerrarlo antes de reiniciar o usar los comandos independientes:
+
+```powershell
+npm.cmd run dev:frontend
+npm.cmd run dev:backend
+```
+
+## Verificar
 
 ```powershell
 npm.cmd run lint
 npm.cmd test
+npm.cmd run check:backend
 npm.cmd run test:render
 npm.cmd run build
 ```
 
-GitHub Actions ejecuta estas comprobaciones en pushes a Aiden/main y pull requests. El frontend de producción se genera en `dist/`; usa rutas con hash, por lo que no requiere reescrituras de rutas del servidor.
+GitHub Actions tiene trabajos separados para frontend y backend. El build genera frontend/dist. En producción se necesita un proxy HTTPS /api al backend o configurar VITE_API_BASE_URL al compilar.
 
-## Funciones operativas
+## Funciones conectadas
 
-- Entrada pública separada del espacio privado; registro con aceptación de reglas beta, ingreso, confirmación de correo según Auth, recuperación y cambio de contraseña, cierre de sesión.
-- Onboarding reanudable; seis bases de avatar con cabello, ropa, fondo y accesorios; nombre e identificador único; intereses y privacidad.
-- Dashboard responsive con búsqueda, ocho categorías, recomendaciones por intereses, amistades y agenda basadas en datos reales.
-- Catálogo comunitario de metadatos y enlaces oficiales, fichas, búsqueda y filtros. No hay streaming ni contenido comercial copiado.
-- Biblioteca privada: favoritos, estados, progreso y etiquetas emocionales; reseñas de 1 a 5 con edición y retirada.
-- Colecciones privadas o compartidas con miembros; edición y gestión de contenidos.
-- Tarjeta de comunidad opcional, solicitudes y aceptación de amistad, bloqueo y desbloqueo.
-- Mensajes 1:1 entre amistades y chat grupal dentro de Parties; Realtime con recarga de respaldo y reconexión.
-- Parties públicas, de amigos o por invitación; horario y zona, cupos, duración, reglas, RSVP, lista de espera y moderación del anfitrión. Cambios de fecha/estado generan notificaciones.
-- Sala con cuenta regresiva, propuestas y votos, enlaces oficiales, invitaciones, expulsión y readmisión; presencia opcional, desactivada por defecto y visible sólo para participantes.
-- Agenda y exportación de encuentros a calendario ICS.
-- Tinta Viva y Galería Viva: borradores privados, publicaciones originales, imágenes en Storage privado, atribución, comentarios y reportes.
-- Notificaciones reales, preferencias de tema por cuenta, descarga de datos propios, manejo de desconexión y errores.
-- Panel de moderación con roles internos, reportes y registro de decisiones. Nadie obtiene rol de moderador desde el cliente.
+Registro y acceso, onboarding reanudable, seis avatares personalizables, temas, catálogo comunitario con enlaces oficiales, biblioteca privada, favoritos, progreso, etiquetas, colecciones y reseñas. Comunidad con tarjeta opcional, amistades, bloqueos, mensajes, notificaciones, Parties, agenda, RSVP, cupos transaccionales, invitaciones, chat, cola, votos y presencia opt-in. Tinta Viva y Galería Viva incluyen borradores, obras, comentarios, imágenes privadas y reportes. Moderación utiliza roles internos y auditoría.
 
-## Estructura modular
+No se rellenan permanentemente las cuentas nuevas con usuarios, obras o reproducciones ficticias.
 
-```text
-Juntopia/
-??? frontend/                 # Navegador: React, CSS y cliente p?blico
-?   ??? src/app/              # Entrada, rutas y layout
-?   ??? src/modules/          # Funciones del producto por dominio
-?   ??? src/shared/           # UI com?n, hooks, transporte y dominio
-?   ??? tests/                # Pruebas de arquitectura, dominio y render
-?   ??? .env.example          # S?lo variables VITE_ publicables
-?   ??? package.json
-??? backend/                  # Supabase: negocio, seguridad y persistencia
-?   ??? supabase/migrations/  # Tablas, RLS, RPC, triggers y Storage
-?   ??? supabase/tests/       # Pruebas SQL de aislamiento
-?   ??? tests/integration/    # Pruebas reales de Auth/REST/Realtime/Storage
-?   ??? scripts/              # Preparaci?n de fixtures descartables
-?   ??? .env.example          # Configuraci?n del entorno backend
-?   ??? package.json
-??? docs/                     # Arquitectura, seguridad y verificaci?n
-??? package.json              # Orquesta los dos workspaces
-??? package-lock.json         # Un lockfile para instalaci?n reproducible
-```
+## Límites de lanzamiento
 
-M?dulos del frontend: auth, home, catalog, library, collections, community, parties, creators, profile y moderation. Cada m?dulo tiene un index.js p?blico y sus p?ginas/componentes propios. La capa compartida no depende de m?dulos ni importa c?digo del backend; las pruebas verifican esos l?mites.
+- Configurar URLs permitidas, SMTP, remitente y controles antiabuso de Auth. No se verificó entrega de correos a una bandeja real.
+- Designar moderadores desde administración; el cliente no puede otorgarse roles.
+- Completar contacto del responsable, retención y revisión de las reglas de la beta antes de publicación pública.
+- La eliminación completa de cuentas sigue siendo administrativa: requiere revocar sesiones y retirar sus archivos.
+- Catálogos de terceros, reproducción autorizada, lectores EPUB/PDF, grupos independientes de Parties, push, cobros y anuncios no están integrados.
+- La búsqueda lista hasta 200 fichas recientes; otros listados 100/200 registros y chats los últimos 100 mensajes. El crecimiento requiere paginación adicional y pruebas de carga.
+- Revisión visual interactiva pendiente por indisponibilidad del host de navegador. Se comprobaron compilación, render, API y permisos.
 
-El backend se ejecuta en Supabase. La autorizaci?n, cupos, integridad, moderaci?n y archivos privados est?n en PostgreSQL/RLS/RPC/Storage. frontend/src/shared/data es un cliente de ese backend, no el lugar donde se conceden permisos. No hay un servidor Express adicional.
-
-Comandos independientes desde Juntopia:
-
-```powershell
-npm.cmd run dev --workspace @juntopia/frontend
-npm.cmd run build --workspace @juntopia/frontend
-npm.cmd run lint --workspace @juntopia/backend
-npm.cmd run check:backend
-```
-
-Ver [frontend](frontend/README.md), [backend](backend/README.md), [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md) y [verificaci?n](docs/VERIFICACION.md).
+Ver [frontend](frontend/README.md), [backend](backend/README.md), [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md) y [verificación](docs/VERIFICACION.md).

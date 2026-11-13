@@ -20,3 +20,8 @@ La revisión no equivale a una auditoría de penetración. Antes del lanzamiento
 ## Dependencias
 
 La instalación detectó cuatro avisos moderados en dependencias de desarrollo de ESLint/minimatch; sin avisos de producción en la auditoría realizada. No se degradaron versiones ni se aplicó audit fix --force. Revisar el registro npm y actualizar de forma compatible antes del lanzamiento.
+## Capa API independiente
+
+El servidor Node valida cada token con Auth.getUser antes de consultar datos. Se utiliza un cliente Supabase nuevo por petición, con la clave publicable y la autorización del usuario, por lo que RLS sigue vigente. Las rutas no aceptan nombres arbitrarios de tablas/RPC, filtros sin validar ni actualizaciones sin filtro. La API limita cuerpos y solicitudes, comprueba firma de imágenes y no devuelve detalles internos o credenciales.
+
+El SDK del navegador queda para Auth y Realtime. En producción la API debe exponerse mediante HTTPS con FRONTEND_ORIGINS exactos. No se usan cookies de sesión para las rutas API; cada llamada envía Authorization y las respuestas tienen Cache-Control: no-store.

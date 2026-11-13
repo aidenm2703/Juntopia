@@ -1,33 +1,37 @@
-﻿# Verificación de la entrega
+﻿# Verificación
 
-## Ejecutado
+## Etapa actual: backend con src propio
 
-- npm run lint: aprobado.
-- npm test: tres pruebas de utilidades (URL, ICS y errores).
-- npm run test:render: diez comprobaciones de render estático de registro, cambio de contraseña, seis avatares distintos, landing pública y enlaces seguros. No son pruebas de interacción del navegador.
-- npm run build: aprobado, con separación en módulos de carga diferida.
-- backend/supabase/tests/profile_isolation.sql y community_isolation.sql: ejecutados contra el proyecto nuevo con rollback. Comprueban aislamiento, propiedad, colecciones privadas, privacidad de mensajes, capacidad, bloqueos, permisos de moderación y presencia opt-in.
-- backend/tests/integration/api-smoke.mjs: treinta comprobaciones reales con tres cuentas descartables. Incluye inicio de sesión Auth, perfil y tarjeta atómicos, duplicados, biblioteca, reseñas, RSVP concurrente, privacidad de chats, recepción de un cambio por Realtime, Storage privado/publicado, zonas horarias y bloqueo. Se corrigió una política RLS detectada al devolver filas recién creadas por la API.
-- Cuentas, archivos y contenidos descartables retirados. Consulta final: cero cuentas smoke, perfiles, contenidos, Parties y objetos de prueba.
-- Asesor Supabase: tres avisos INFO de tablas administrativas cerradas intencionalmente; sin ERROR/WARN.
+- Lint de frontend y backend aprobado.
+- Ocho pruebas de frontend: arquitectura, separación entre proyectos, acceso a datos únicamente por la API, URLs, agenda y errores.
+- Nueve pruebas de backend: configuración, sesiones, aislamiento de clientes, asignación de propietario, consultas peligrosas, cuerpos grandes, CORS, imágenes, límites y sanitización de errores. Incluyen solicitudes HTTP reales a un servidor local con dependencias de datos aisladas.
+- Diez comprobaciones de render estático: entrada pública, registro, contraseñas, seis avatares distintos y enlaces.
+- Compilación de frontend aprobada y sintaxis de servidor/scripts comprobada.
+- Doce comprobaciones reales a través de la API Node y Supabase: autenticación, perfil propio/ajeno, colección privada, escritura ajena, RSVP concurrente, exportación por usuario, subida/firma/retirada de imágenes y rechazo de privilegios de moderación.
+- Backend /api/health y proxy desde localhost:3000/api responden HTTP 200.
+- Las cuentas y archivos descartables se retiraron; la consulta final confirmó cero cuentas smoke.
+
+La nueva API utiliza el JWT del usuario y la clave publicable, sin service_role. Las pruebas reales comprueban que la capa Node conserva RLS; los tests con dobles no se presentan como prueba de permisos de la base.
+
+## Evidencia previa conservada
+
+Las pruebas SQL de perfiles y comunidad se ejecutaron con rollback. La integración directa de Supabase pasó treinta comprobaciones de Auth, REST, RLS, Realtime y Storage. No se modificaron las cinco migraciones durante esta etapa. Tres avisos INFO de tablas administrativas sin políticas son intencionales; no se abrieron sus permisos.
 
 ## Repetir integración
 
-Usar un proyecto de pruebas con estas migraciones y configurar .env.local. Ejecutar node backend/scripts/prepare-smoke.mjs, aplicar el archivo privado .test-runtime/setup.sql desde administración, ejecutar node backend/tests/integration/api-smoke.mjs y aplicar .test-runtime/cleanup.sql. El script no contiene claves administrativas; la preparación y limpieza de auth.users son administrativas. No correr contra una base de producción ni imprimir los fixtures: contienen contraseñas aleatorias descartables. Retirar los archivos locales al terminar. Las subidas se retiran en finally y las sesiones se cierran antes de eliminar usuarios.
+Configurar backend/.env.local según backend/.env.example y usar un proyecto de pruebas con las migraciones aplicadas.
 
-## No verificado
+```powershell
+npm.cmd run test:prepare --workspace @juntopia/backend
+# Aplicar backend/.test-runtime/setup.sql desde administración.
+npm.cmd run test:http:integration --workspace @juntopia/backend
+# Opcional, integración directa de Supabase:
+npm.cmd run test:integration --workspace @juntopia/backend
+# Aplicar backend/.test-runtime/cleanup.sql desde administración.
+```
 
-- Entrega de email, confirmación y recuperación desde una bandeja real: requiere configuración SMTP/URLs del operador.
-- Navegación visual de escritorio/móvil: el host de automatización de navegador no está disponible y la autorización para Chrome venció.
-- Licencias de proveedores y reproducción: sin integraciones activadas.
-- Rendimiento bajo carga, pentest, revisión legal y publicación en dominio final.
+Los fixtures contienen contraseñas aleatorias descartables: no imprimirlos ni subirlos. Retirar los archivos locales al terminar. No ejecutar estas preparaciones contra producción. Los scripts no contienen claves administrativas.
 
-## Prueba manual recomendada
+## Pendiente
 
-Crear y confirmar dos cuentas propias. Completar onboarding; hacer visibles sus tarjetas, solicitar y aceptar amistad; iniciar una conversación; agregar una ficha con enlace oficial; guardar favorito, reseña y colección; crear una Party de dos cupos; confirmar asistencia; enviar mensajes, proponer contenidos, votar e invitar. Cambiar fecha y comprobar la notificación. Bloquear una cuenta y comprobar que deja de acceder a chat/Party. Crear una obra como borrador, verificar privacidad y después publicarla. Repetir en teléfono y con teclado.
-
-## Reorganizaci?n modular
-
-Frontend y backend son workspaces npm separados. Despu?s de moverlos se ejecutaron lint de ambos, verificaci?n de sintaxis del backend, siete pruebas locales (cuatro de l?mites arquitect?nicos), diez comprobaciones de render y compilaci?n. Las cinco migraciones se compararon con Git y conservan el mismo SHA-256: no se cambi? el esquema remoto ni se repitieron las pruebas API de la entrega anterior.
-
-Para repetir las pruebas API, configurar backend/.env.local seg?n backend/.env.example y ejecutar desde Juntopia: npm run test:prepare --workspace @juntopia/backend; aplicar administrativamente backend/.test-runtime/setup.sql; npm run test:integration --workspace @juntopia/backend; aplicar backend/.test-runtime/cleanup.sql. Los archivos con contrase?as descartables est?n ignorados por Git.
+Revisión visual de escritorio/móvil, entrega real de correo y recuperación desde bandeja, carga, pentest, revisión legal y despliegue público. No se dan por verificadas las integraciones externas o la reproducción que no están habilitadas.
