@@ -73,7 +73,12 @@ function Detail({
         ← Volver a descubrir
       </a>
       <section className="detail-hero panel">
-        <p className="eyebrow">{item.category} · APORTE DE LA COMUNIDAD</p>
+        <p className="eyebrow">
+          {item.category} ·{" "}
+          {item.source === "community"
+            ? "APORTE DE LA COMUNIDAD"
+            : "DESCUBRIMIENTO"}
+        </p>
         <h1>{item.title}</h1>
         <p className="byline">{item.author}</p>
         <p className="preserve-lines">
@@ -121,7 +126,15 @@ function Detail({
               >
                 {Object.entries(readingStates).map(([value, label]) => (
                   <option value={value} key={value}>
-                    {label}
+                    {value === "completed"
+                      ? {
+                          Música: "Ya lo escuché",
+                          Podcasts: "Ya lo escuché",
+                          Libros: "Ya lo leí",
+                          Videojuegos: "Ya lo jugué",
+                          Arte: "Ya lo conozco",
+                        }[item.category] || "Ya lo vi"
+                      : label}
                   </option>
                 ))}
               </select>

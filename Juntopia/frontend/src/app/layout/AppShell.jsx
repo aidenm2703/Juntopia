@@ -16,6 +16,7 @@ const links = [
   ["profile", "♙", "Mi perfil"],
   ["settings", "⚙", "Configuración"],
 ];
+import { CulturalChat } from "../../modules/catalog/assistant.js";
 export function AppShell({ profile, route, children, logout }) {
   const [menu, setMenu] = useState(false);
   const [online, setOnline] = useState(navigator.onLine);
@@ -168,6 +169,7 @@ export function AppShell({ profile, route, children, logout }) {
           onClick={() => setMenu(false)}
         />
       )}
+      <CulturalChat />
     </div>
   );
 }

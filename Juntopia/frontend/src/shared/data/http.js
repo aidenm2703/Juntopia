@@ -5,7 +5,7 @@ export async function publicRequest(path, body) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(path === "/catalog/assistant" ? 45000 : 30000),
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
@@ -37,7 +37,7 @@ export async function request(
     method,
     headers,
     body: body === undefined ? undefined : binary ? body : JSON.stringify(body),
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(path === "/catalog/assistant" ? 45000 : 30000),
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok) {

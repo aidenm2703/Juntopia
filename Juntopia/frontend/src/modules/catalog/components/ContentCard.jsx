@@ -1,14 +1,25 @@
 import { categories, safeUrl } from "../../../shared/domain/index.js";
-export function ContentCard({ item, onOpen }) {
+export function ContentCard({ item, onOpen, external = false }) {
   const category =
     categories.find((c) => c.name === item.category) || categories[0];
   return (
     <button
       className="content-card"
-      onClick={() => onOpen(item.id)}
+      onClick={() => onOpen(external ? item.external_id : item.id)}
       style={{ "--accent": category.color }}
     >
       <div className="content-cover" aria-hidden="true">
+        {safeUrl(item.image_url) && (
+          <img
+            src={safeUrl(item.image_url)}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              e.currentTarget.hidden = true;
+            }}
+          />
+        )}
         <span>{category.icon}</span>
         <i>{item.title.slice(0, 1)}</i>
       </div>
@@ -16,7 +27,7 @@ export function ContentCard({ item, onOpen }) {
         <small>{item.category}</small>
         <h3>{item.title}</h3>
         <p>{item.author || "Aporte de la comunidad"}</p>
-        <span>Ver ficha ↗</span>
+        <span>{external ? "Elegir esta obra ↗" : "Guardar y calificar ↗"}</span>
       </div>
     </button>
   );

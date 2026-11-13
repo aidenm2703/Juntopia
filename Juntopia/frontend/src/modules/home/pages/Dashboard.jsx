@@ -7,12 +7,13 @@ import { Avatar } from "../../../shared/components/Avatar.jsx";
 import { ContentCard } from "../../catalog/components/ContentCard.jsx";
 import { PartyCard } from "../../parties/index.js";
 import { navigate } from "../../../app/router.js";
+import { DiscoveryShelf } from "../../catalog/assistant.js";
 export function Dashboard({ profile }) {
   const query = useQuery(
     useCallback(async () => {
       const [contents, parties, friendships, cards, attendees, library] =
         await Promise.all([
-          api.list("content_items"),
+          api.list("content_items", { limit: 200 }),
           api.list("parties", { order: "starts_at", ascending: true }),
           api.list("friendships", { filters: { status: "accepted" } }),
           api.list("member_cards", { order: "display_name" }),
@@ -94,14 +95,15 @@ export function Dashboard({ profile }) {
           return (
             <div className="home-columns">
               <div>
+                <DiscoveryShelf compact />
                 <section className="home-section">
                   <div className="section-heading">
                     <div>
-                      <h2>✧ Un descubrimiento para vos</h2>
+                      <h2>✧ Explorá el catálogo</h2>
                       <p>
                         {recommended.length
                           ? "Por los intereses que elegiste."
-                          : "Aportes recientes de nuestra comunidad."}
+                          : "Una selección para empezar, lista para guardar y calificar."}
                       </p>
                     </div>
                     <a href="#/discover">Ver todo →</a>
