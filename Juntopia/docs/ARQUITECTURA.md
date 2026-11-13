@@ -1,30 +1,32 @@
-# Juntopia · auditoría y plan
+﻿# Arquitectura actual
 
-La base recibida es React con Vite en JavaScript, sin backend, pruebas ni rutas. App.jsx importa tres imágenes ausentes. Se preserva Vite y la referencia src/assets/Juntopia.png, inspeccionada antes de implementar. Identidad: bosque profundo, crema, oliva, luz cálida y paneles redondeados. La referencia no se utiliza como fondo ni como catálogo real.
+## Decisión de stack
 
-## Arquitectura
+JavaScript, React y Vite, conservando el framework inicial. La instrucción más reciente del usuario reemplaza TypeScript. No hay fuentes .ts/.tsx ni compilador TypeScript como dependencia directa. Los tipos transitivos que traigan bibliotecas no forman parte del código de la aplicación.
 
-React + TypeScript; componentes compartidos en components, flujos en features, acceso a Supabase en lib. PostgreSQL y Auth aplican permisos reales con RLS; el navegador utiliza exclusivamente una clave publicable. Sin proyecto confirmado no se altera ninguna base remota. El perfil privado contiene nombre, identificador único, avatar estructurado, intereses, privacidad y avance del onboarding.
+## Identidad
 
-## Modelo incremental
+Referencia inspeccionada: src/assets/Juntopia.png. Bosque profundo, musgo, crema, luz cálida, bordes oliva y paneles redondeados. Se reconstruyó con componentes, CSS y SVG; no se usa la imagen de referencia como fondo ni se copian sus ejemplos como datos reales.
 
-Fase 1: auth.users → profiles (1:1, propietario exclusivamente). Avatar persistido como parámetros, no una URL generada. Identificador único normalizado. Intereses inicialmente como lista validada.
+## Separación de responsabilidades
 
-Fase 3: categories → content_items → content_sources/external_ids; profiles → collections → collection_items; estados y reseñas con unicidad usuario/contenido. Separar metadatos globales de interacciones privadas.
+- La aplicación React se ocupa de interfaz y estado; las páginas se cargan bajo demanda.
+- Auth gestiona las credenciales. El navegador sólo utiliza la clave publicable.
+- PostgreSQL valida integridad, privacidad y propiedad con RLS. Los controles visuales no son autorización.
+- Las funciones privadas privilegiadas tienen search_path vacío, permisos explícitos y comprobaciones de identidad. Los endpoints RPC públicos son wrappers SECURITY INVOKER.
+- Storage es privado; los enlaces firmados de obras autorizadas duran 60 segundos. Una obra privada no habilita acceso a otros usuarios por conocer su ruta.
+- Realtime difunde cambios sujetos a políticas. Se recargan datos al reconectar, enfocar y cada 30 segundos como respaldo.
 
-Fases 5–6: amistades, bloqueos, conversaciones y miembros; parties, invitaciones, participantes y mensajes. Acceso según membresía, privacidad y bloqueos; nunca habilitar lectura global de conversaciones.
+## Datos
 
-## Fases verificables
+profiles conserva el perfil privado y progreso; member_cards comparte sólo lo que el usuario habilita. save_profile guarda ambos atómicamente. policy_acceptances registra versión y hora del servidor. user_settings guarda preferencias.
 
-1. Entrada pública, temas, autenticación y onboarding con seis avatares; esquema privado con RLS.
-2. Dashboard conectado y estados vacíos; sin amigos, puntuaciones o reproductor ficticios.
-3. Catálogo, colecciones, reseñas y pruebas de aislamiento entre usuarios.
-4. Adaptadores de proveedores tras validar sus términos vigentes.
-5. Comunidad y moderación.
-6. Parties y Realtime con pruebas de permisos y reconexión.
-7. Creación original y extras.
-8. Accesibilidad, rendimiento, revisión legal y despliegue.
+categories y content_items separan catálogo de user_content_status, reviews, collections y collection_items. Las fichas contienen metadatos originales y enlaces a fuentes oficiales.
 
-## Límites
+friendships, blocks, conversations y messages definen relaciones y mensajes privados. parties, invites, attendees, bans, messages, queue, votes y presence modelan encuentros. El RSVP bloquea la fila de la Party antes de contar participantes para impedir sobrecupos concurrentes.
 
-No se habilitan pagos ni reproducción. Antes del lanzamiento se requieren textos legales definitivos, SMTP, configuración de URLs permitidas, controles antiabuso y pruebas reales entre dos usuarios. El backend no se considera verificado hasta ejecutar su SQL y los flujos contra el proyecto correcto.
+creator_works y work_comments modelan creación original con borradores y publicación. reports y las tablas privadas de moderación dejan trazabilidad. notifications se genera desde triggers autorizados.
+
+## Alcance de esta beta
+
+La plataforma social está conectada al backend. No se simula streaming, pagos, usuarios, amistades o recomendaciones. Los términos definitivos, entrega de correos, eliminación automatizada de cuentas y proveedores externos son dependencias de lanzamiento, detalladas en README.md.

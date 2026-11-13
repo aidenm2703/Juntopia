@@ -1,53 +1,61 @@
 ﻿# Juntopia
 
-Comunidad para descubrir y compartir planes. React + TypeScript + Vite y Supabase Auth/PostgreSQL. Desarrollo en la rama Aiden.
+Aplicación web full stack en **JavaScript + React + Vite + Supabase**, desarrollada en la rama `Aiden`. La instrucción actual de JavaScript sustituye la propuesta anterior de TypeScript.
 
-## Ejecutar
+## Arranque
 
-Desde la carpeta Juntopia:
+Requiere Node.js 22.12 o superior (recomendado 24).
 
 ```powershell
+cd Juntopia
 npm.cmd ci
 Copy-Item .env.example .env.local
-# Completar URL y clave publicable de Supabase.
+# Completar la URL y clave publicable de Supabase.
 npm.cmd run dev
 ```
 
-La configuración local ya apunta al proyecto nuevo czdldzleooqoqerxmmkk. .env.local no se sube a Git. Nunca usar claves secretas/service_role en variables VITE_.
-
-## Verificar
+Abrir **http://localhost:3000**. Si `.env.local` ya está configurado, conservarlo y omitir Copy-Item. Este equipo apunta al proyecto Juntopia `czdldzleooqoqerxmmkk`. Ninguna clave secreta se incluye en el frontend ni en Git.
 
 ```powershell
-npm.cmd run typecheck
 npm.cmd run lint
+npm.cmd test
+npm.cmd run test:render
 npm.cmd run build
 ```
 
-La migración supabase/migrations/20261113160527_identity_profiles.sql ya se aplicó al proyecto remoto. No volver a aplicarla manualmente. La prueba supabase/tests/profile_isolation.sql verifica aislamiento entre usuarios, actualización propia y restricciones de avatar. Usa ROLLBACK y no deja cuentas de prueba.
+GitHub Actions ejecuta estas comprobaciones en pushes a Aiden/main y pull requests. El frontend de producción se genera en `dist/`; usa rutas con hash, por lo que no requiere reescrituras de rutas del servidor.
 
-## Implementado
+## Funciones operativas
 
-- Landing pública sin datos privados ni contenido ficticio.
-- Temas claro/oscuro/sistema persistidos localmente, foco visible y movimiento reducido.
-- Supabase Auth: restauración de sesión, ingreso, solicitud de recuperación, cambio de contraseña y cierre de sesión.
-- Acceso privado condicionado por sesión y onboarding.
-- Seis avatares SVG parametrizados, color, nombre, identificador único, biografía, intereses y privacidad.
-- Guardado de avance en cada paso para reanudar en otro dispositivo.
-- Perfil PostgreSQL con restricciones y RLS por propietario.
-- Inicio privado con estados vacíos y edición del perfil.
+- Entrada pública separada del espacio privado; registro con aceptación de reglas beta, ingreso, confirmación de correo según Auth, recuperación y cambio de contraseña, cierre de sesión.
+- Onboarding reanudable; seis bases de avatar con cabello, ropa, fondo y accesorios; nombre e identificador único; intereses y privacidad.
+- Dashboard responsive con búsqueda, ocho categorías, recomendaciones por intereses, amistades y agenda basadas en datos reales.
+- Catálogo comunitario de metadatos y enlaces oficiales, fichas, búsqueda y filtros. No hay streaming ni contenido comercial copiado.
+- Biblioteca privada: favoritos, estados, progreso y etiquetas emocionales; reseñas de 1 a 5 con edición y retirada.
+- Colecciones privadas o compartidas con miembros; edición y gestión de contenidos.
+- Tarjeta de comunidad opcional, solicitudes y aceptación de amistad, bloqueo y desbloqueo.
+- Mensajes 1:1 entre amistades y chat grupal dentro de Parties; Realtime con recarga de respaldo y reconexión.
+- Parties públicas, de amigos o por invitación; horario y zona, cupos, duración, reglas, RSVP, lista de espera y moderación del anfitrión. Cambios de fecha/estado generan notificaciones.
+- Sala con cuenta regresiva, propuestas y votos, enlaces oficiales, invitaciones, expulsión y readmisión; presencia opcional, desactivada por defecto y visible sólo para participantes.
+- Agenda y exportación de encuentros a calendario ICS.
+- Tinta Viva y Galería Viva: borradores privados, publicaciones originales, imágenes en Storage privado, atribución, comentarios y reportes.
+- Notificaciones reales, preferencias de tema por cuenta, descarga de datos propios, manejo de desconexión y errores.
+- Panel de moderación con roles internos, reportes y registro de decisiones. Nadie obtiene rol de moderador desde el cliente.
 
-## Pendiente antes de usar con personas reales
+## Arquitectura
 
-El formulario y llamada de registro están preparados; el botón permanece deshabilitado hasta contar con términos/política y aceptación versionada. No se simula éxito. Para probar el onboarding mientras tanto, crear una cuenta de prueba en Supabase Auth con el correo de quien prueba y acceder desde Ingresar.
+`src/components`: interfaz compartida. `src/features`: acceso y onboarding. `src/pages`: módulos cargados bajo demanda. `src/hooks`: sesión, navegación, consultas, acciones y Realtime. `src/lib`: acceso a datos, validación y utilidades. `supabase/migrations`: backend versionado. `supabase/tests`: aislamiento y permisos. `tests`: utilidades y render. `scripts`: pruebas de integración descartables.
 
-En Supabase Auth → URL Configuration establecer Site URL y Redirect URLs para http://127.0.0.1:5173 y posteriormente el dominio real. Revisar confirmación de correo, contraseña, SMTP y controles antiabuso antes del lanzamiento. Recuperación basada en la documentación oficial: https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail
+Ver [arquitectura](docs/ARQUITECTURA.md), [seguridad](docs/SEGURIDAD.md), [verificación](docs/VERIFICACION.md) y [backend](supabase/README.md).
 
-La privacidad de actividad se guarda como preferencia; aún no existe publicación de actividad. Catálogo, comunidad, Parties y pagos pertenecen a fases siguientes.
+## Configuración y límites reales de lanzamiento
 
-## Validación
+1. En Supabase Auth, revisar Site URL y Redirect URLs para `http://localhost:3000` y el dominio definitivo. Usar SMTP propio para entrega a personas ajenas al equipo, configurar remitente, límites y protección antiabuso. El código de registro está habilitado; no se verificó entrega de correos reales.
+2. Designar moderadores desde administración, agregando su UUID a `private.moderators`. No se asignan roles automáticamente ni mediante user_metadata.
+3. Los textos de reglas y privacidad son de una beta y requieren datos del responsable, contacto, retención y revisión antes del lanzamiento público.
+4. La eliminación completa de cuenta continúa siendo administrativa en Supabase; no se muestra un botón que finja eliminarla. Requiere revocar sesiones y retirar también los archivos del usuario.
+5. Catálogos externos, reproducción autorizada, lectores EPUB/PDF, chats grupales independientes de Parties, notificaciones push, pagos y anuncios no están integrados. El núcleo social funciona con fichas de enlaces oficiales y creaciones propias, sin depender de estas integraciones.
+6. La búsqueda muestra hasta 200 fichas recientes; otros listados hasta 100/200 registros. Los chats muestran los últimos 100 mensajes. El crecimiento requiere paginación adicional y revisión de costes.
+7. Verificación visual interactiva pendiente: el host de navegador no estaba disponible y la aprobación para Chrome venció. Se verificaron build, lint, render y API, sin afirmar una prueba visual que no se pudo realizar.
 
-TypeScript, lint y build ejecutados. Prueba SQL ejecutada contra el proyecto nuevo y asesor de seguridad sin alertas. Servidor local devuelve HTTP 200. Revisión visual pendiente: el host de automatización del navegador no está disponible. Entrega de correo y flujos autenticados completos pendientes de una cuenta de prueba; no se consideran verificados.
-
-Auditoría npm: 10 avisos moderados de desarrollo por la cadena de minimatch; ninguno en producción. No se aplicó audit fix --force ni degradación automática.
-
-Ver docs/ARQUITECTURA.md. Próximo bloque: terminar registro/consentimiento y validar Auth antes de ampliar el catálogo.
+No se considera esta beta un lanzamiento público completo con todas las integraciones del documento de visión.

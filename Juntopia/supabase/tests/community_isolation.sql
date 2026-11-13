@@ -25,6 +25,11 @@ do $$ begin
  raise exception 'Direct RSVP allowed'; exception when insufficient_privilege then null; end;
 end $$;
 insert into public.friendships(id,addressee_id) values('11111111-aaaa-4111-8111-111111111111','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+do $$ begin
+ if public.party_heartbeat('ffffffff-ffff-4fff-8fff-ffffffffffff') then raise exception 'Presence enabled by default'; end if;
+end $$;
+insert into public.profiles(id,display_name,username,activity_visible) values(auth.uid(),'B','presence_b',true);
+select public.party_heartbeat('ffffffff-ffff-4fff-8fff-ffffffffffff');
 select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
 update public.friendships set status='accepted' where id='11111111-aaaa-4111-8111-111111111111';
 insert into public.conversations(id,member_b) values('22222222-aaaa-4222-8222-222222222222','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb');
@@ -32,6 +37,10 @@ insert into public.messages(conversation_id,body) values('22222222-aaaa-4222-822
 select set_config('request.jwt.claim.sub','cccccccc-cccc-4ccc-8ccc-cccccccccccc',true);
 do $$ begin
  if public.set_party_rsvp('ffffffff-ffff-4fff-8fff-ffffffffffff','going')<>'waitlist' then raise exception 'Capacity exceeded'; end if;
+ if (select count(*) from public.party_presence where party_id='ffffffff-ffff-4fff-8fff-ffffffffffff')<>0 then raise exception 'Presence leaked to visitor'; end if;
+ begin
+ perform public.party_heartbeat('ffffffff-ffff-4fff-8fff-ffffffffffff');
+ raise exception 'Waitlisted user posted presence'; exception when insufficient_privilege then null; end;
  if (select count(*) from public.messages where conversation_id='22222222-aaaa-4222-8222-222222222222')<>0 then raise exception 'Private messages leaked'; end if;
  if (select count(*) from public.conversations where id='22222222-aaaa-4222-8222-222222222222')<>0 then raise exception 'Conversation leaked'; end if;
  begin
