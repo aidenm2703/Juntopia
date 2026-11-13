@@ -47,3 +47,8 @@ No se enviaron nuevos correos a una bandeja real ni se automatizó la interfaz d
 La raíz que contiene contexto.md ahora tiene package.json con comandos de acceso. npm.cmd run dev funciona desde esa raíz o desde Juntopia. npm.cmd run setup instala los workspaces desde la raíz cuando faltan dependencias.
 
 El lanzador comprueba los puertos antes de crear procesos. Reutiliza servidores reconocidos de Juntopia, muestra sus URLs y rechaza servicios ajenos sin terminarlos. Se verificó el arranque desde la raíz con el frontend ya abierto y el backend detenido: el backend arrancó y ambos respondieron.
+## Reinicio con entrada al registro
+
+Se desactivó la persistencia de sesión en la configuración local solicitada por el usuario. Se añadieron pruebas para comprobar que sólo se elimina el token del proyecto, se conservan tema y sesiones de otras aplicaciones, y no se alteran los enlaces de recuperación o las rutas públicas explícitas.
+
+Lint aprobado; dieciséis pruebas frontend y trece backend aprobadas; build aprobado. Se cerraron los procesos anteriores de Juntopia y se iniciaron nuevamente frontend y backend. El acceso automático al navegador no estaba disponible: la URL de registro se entrega como enlace para abrir manualmente. No se modificaron cuentas o datos en Supabase.

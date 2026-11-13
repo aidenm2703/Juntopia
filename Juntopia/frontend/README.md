@@ -30,3 +30,8 @@ También podés usar `npm.cmd run dev` desde Juntopia para iniciar ambos proceso
 Configuración: `frontend/.env.local`, basada en `.env.example`. Las variables VITE_ son públicas: sólo URL, clave publicable de Supabase y `VITE_API_BASE_URL`. Nunca service_role, SMTP ni secretos de proveedores.
 
 Desarrollo: http://localhost:3000. Vite redirige `/api` al backend http://127.0.0.1:4000. Salida de compilación: `frontend/dist/`. En producción se necesita un proxy `/api` al backend o configurar la URL HTTPS de la API antes del build.
+## Inicio limpio para las pruebas locales
+
+Con VITE_AUTH_PERSIST_SESSION=false en frontend/.env.local, cada carga nueva elimina únicamente el token local de este proyecto, descarta una recuperación antigua y entra al registro. La sesión se mantiene en memoria mientras la página esté abierta; al recargar o abrir otra pestaña hay que ingresar de nuevo. No se borran cuentas, bibliotecas, progreso del onboarding ni preferencias de tema.
+
+Las rutas públicas explícitas y los enlaces válidos de confirmación/recuperación conservan su destino. Para volver a recordar la sesión entre visitas, configurar VITE_AUTH_PERSIST_SESSION=true y reiniciar Vite.
