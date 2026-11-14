@@ -1,0 +1,27 @@
+{
+  "name": "@juntopia/backend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src scripts tests",
+    "check": "node --check src/server.js && node --check scripts/prepare-smoke.mjs && node --check tests/integration/api-smoke.mjs",
+    "test:prepare": "node scripts/prepare-smoke.mjs",
+    "test:integration": "node tests/integration/api-smoke.mjs",
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test tests/unit/*.test.js tests/http/*.test.js",
+    "test:http:integration": "node tests/integration/http-smoke.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "globals": "^17.13.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

@@ -1,0 +1,41 @@
+name: Validar Juntopia
+on:
+  push:
+    branches: [Aiden, main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Juntopia
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Juntopia/package-lock.json
+      - run: npm ci
+      - run: npm run lint --workspace @juntopia/frontend
+      - run: npm test --workspace @juntopia/frontend
+      - run: npm run test:render
+      - run: npm run build
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Juntopia
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Juntopia/package-lock.json
+      - run: npm ci
+      - run: npm run lint --workspace @juntopia/backend
+      - run: npm run check:backend
+      - run: npm test --workspace @juntopia/backend
