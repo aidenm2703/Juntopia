@@ -1,5 +1,12 @@
 import { useState } from 'react'
 import logo from './assets/juntopia-logo.png'
+import { Catalog } from '../modules/catalog/index.js'
+import { Parties } from '../modules/parties/index.js'
+import { Library } from '../modules/library/index.js'
+import { Collections } from '../modules/collections/index.js'
+import { Friends, Messages, Notifications } from '../modules/community/index.js'
+import { Creators } from '../modules/creators/index.js'
+import { Profile, Settings } from '../modules/profile/index.js'
 import './App.css'
 
 const categories = [
@@ -54,28 +61,54 @@ function Landing({ onEnter, isLightMode, setIsLightMode }) {
   </main>
 }
 
+const previewProfile = {
+  id: 'visual-preview', display_name: 'Alex', username: 'alex', bio: '',
+  interests: [], activity_visible: true, avatar_base: 'orb',
+  avatar_color: '#8e5cff', avatar_options: {},
+}
+
+function FunctionalModule({ view, isLightMode, setIsLightMode }) {
+  const userId = previewProfile.id
+  if (view === 'discover') return <Catalog />
+  if (view === 'parties') return <Parties userId={userId} />
+  if (view === 'agenda') return <Parties userId={userId} agenda />
+  if (view === 'library') return <Library userId={userId} />
+  if (view === 'collections') return <Collections userId={userId} />
+  if (view === 'friends') return <Friends userId={userId} />
+  if (view === 'messages') return <Messages userId={userId} />
+  if (view === 'notifications') return <Notifications userId={userId} />
+  if (view === 'creators') return <Creators userId={userId} />
+  if (view === 'profile') return <Profile profile={previewProfile} refresh={() => {}} />
+  if (view === 'settings') return <Settings userId={userId} theme={isLightMode ? 'light' : 'dark'} setTheme={(theme) => setIsLightMode(theme === 'light')} />
+  return <Catalog />
+}
+
 function App() {
   const [activeNav, setActiveNav] = useState('Inicio')
   const [joined, setJoined] = useState([])
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLightMode, setIsLightMode] = useState(false)
   const [view, setView] = useState('landing')
+  const navTargets = { Inicio: 'dashboard', Descubrir: 'discover', Parties: 'parties', Biblioteca: 'library', Colecciones: 'collections', Amigos: 'friends' }
+  const openView = (nextView, label) => { setView(nextView); setActiveNav(label) }
+  const isFunctionalView = !['landing', 'dashboard'].includes(view)
   const nav = [['⌂', 'Inicio'], ['⌕', 'Descubrir'], ['✦', 'Parties'], ['▱', 'Biblioteca'], ['▤', 'Colecciones'], ['◌', 'Amigos']]
   const toggleParty = (title) => setJoined((current) => current.includes(title) ? current.filter((party) => party !== title) : [...current, title])
 
   if (view === 'landing') return <Landing onEnter={() => setView('dashboard')} isLightMode={isLightMode} setIsLightMode={setIsLightMode} />
 
-  return <main className={`app-shell ${isLightMode ? 'light-mode' : ''}`}>
+  return <main className={`app-shell ${isLightMode ? 'light-mode' : ''} ${isFunctionalView ? 'functional-mode' : ''}`}>
     <div className="ambient ambient-one" /><div className="ambient ambient-two" /><div className="grid-overlay" />
     <aside className="sidebar glass-panel">
       <a className="brand" href="#top" aria-label="Ir a la página de inicio" onClick={(event) => { event.preventDefault(); setView('landing') }}><img src={logo} alt="Juntopia" /></a>
-      <nav className="primary-nav" aria-label="Navegación principal">{nav.map(([icon, item]) => <button key={item} className={activeNav === item ? 'nav-item active' : 'nav-item'} onClick={() => setActiveNav(item)}><span aria-hidden="true">{icon}</span>{item}</button>)}</nav>
-      <div className="sidebar-rule" /><button className="nav-item"><span>◉</span>Mi perfil</button><button className="nav-item"><span>⚙</span>Configuración</button>
+      <nav className="primary-nav" aria-label="Navegación principal">{nav.map(([icon, item]) => <button key={item} className={activeNav === item ? 'nav-item active' : 'nav-item'} onClick={() => openView(navTargets[item], item)}><span aria-hidden="true">{icon}</span>{item}</button>)}</nav>
+      <div className="sidebar-rule" /><button className={activeNav === 'Mi perfil' ? 'nav-item active' : 'nav-item'} onClick={() => openView('profile', 'Mi perfil')}><span>◉</span>Mi perfil</button><button className={activeNav === 'Configuración' ? 'nav-item active' : 'nav-item'} onClick={() => openView('settings', 'Configuración')}><span>⚙</span>Configuración</button>
       <section className="plus-card"><span className="sparkle">✦</span><p className="eyebrow">JUNTOPIA PLUS</p><h2>Tu club, sin límites.</h2><p>Personaliza tus colecciones y crea Parties especiales.</p><button>Mejorar plan <span>↗</span></button></section>
     </aside>
 
     <section className="dashboard" id="inicio">
-      <header className="topbar glass-panel"><label className="search"><span>⌕</span><input placeholder="Busca tu próxima obsesión..." /></label><div className="top-actions"><button className="theme-toggle" onClick={() => setIsLightMode(!isLightMode)} aria-label={isLightMode ? 'Activar modo oscuro' : 'Activar modo claro'}><b>{isLightMode ? 'Modo claro' : 'Modo oscuro'}</b></button><button className="icon-button notification" aria-label="Notificaciones">♧<i /></button><button className="icon-button" aria-label="Mensajes">▢</button><button className="avatar-button" aria-label="Abrir perfil"><span>AM</span><b>⌄</b></button></div></header>
+      <header className="topbar glass-panel"><label className="search"><span>⌕</span><input placeholder="Busca tu próxima obsesión..." /></label><div className="top-actions"><button className="theme-toggle" onClick={() => setIsLightMode(!isLightMode)} aria-label={isLightMode ? 'Activar modo oscuro' : 'Activar modo claro'}><b>{isLightMode ? 'Modo claro' : 'Modo oscuro'}</b></button><button className="icon-button notification" aria-label="Notificaciones" onClick={() => openView('notifications', 'Notificaciones')}>♧<i /></button><button className="icon-button" aria-label="Mensajes" onClick={() => openView('messages', 'Mensajes')}>▢</button><button className="avatar-button" aria-label="Abrir perfil" onClick={() => openView('profile', 'Mi perfil')}><span>AM</span><b>⌄</b></button></div></header>
+      {isFunctionalView ? <section className="module-host functional-workspace"><FunctionalModule view={view} isLightMode={isLightMode} setIsLightMode={setIsLightMode} /></section> : <>
       <section className="welcome-panel glass-panel">
         <div className="star-grid" aria-hidden="true" />
         <div className="welcome-copy">
@@ -96,6 +129,7 @@ function App() {
       <section className="category-grid" aria-label="Categorías">{categories.map(([icon, name, className]) => <button className={`category-card ${className}`} key={name}><span>{icon}</span><strong>{name}</strong><i>✦</i></button>)}</section>
       <section className="content-section"><div className="section-heading"><h2><span>✦</span> Recomendado para ti</h2><button>Ver todo <b>→</b></button></div><div className="recommendation-row">{recommendations.map(([cover, symbol, title, type, rating]) => <article className="recommendation-card glass-panel" key={title}><div className={`cover ${cover}`}><span>{symbol}</span></div><div className="recommendation-info"><div><h3>{title}</h3><p>{type}</p></div><b>★ {rating}</b></div></article>)}</div></section>
       <section className="content-section"><div className="section-heading"><h2><span>✦</span> Parties activas</h2><button>Ver todas <b>→</b></button></div><div className="party-row">{parties.map(([className, icon, title, people]) => <article className={`party-card ${className}`} key={title}><div className="party-stars">✦ · ✧ · ✦</div><span className="party-icon">{icon}</span><div className="party-details"><h3>{title}</h3><p>◉ {people}</p></div><button onClick={() => toggleParty(title)}>{joined.includes(title) ? '¡Te uniste!' : 'Unirme'}</button></article>)}</div></section>
+      </>}
     </section>
 
     <aside className="right-rail">
