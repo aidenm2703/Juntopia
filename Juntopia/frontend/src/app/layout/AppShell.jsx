@@ -66,7 +66,7 @@ export function AppShell({ profile, route, children, logout }) {
     return () => window.removeEventListener("keydown", keyboard);
   }, [menu]);
   return (
-    <div className="app-shell">
+    <div className="functional-workspace app-shell">
       <aside
         id="mobile-nav"
         className={`sidebar ${menu ? "is-open" : ""}`}
